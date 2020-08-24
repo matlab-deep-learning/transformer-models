@@ -1,0 +1,19 @@
+version: 2.1
+orbs:
+  matlab: mathworks/matlab@0.2.0
+
+jobs:
+  build:
+    machine:
+      image: ubuntu-1604:201903-01
+    steps:
+      - checkout
+      - matlab/install:
+          # We want to ensure the repo works in R2020a
+          release: R2020a
+      - matlab/run-tests:
+          test-results-junit: artifacts/test_results/test_results.xml
+      - store_test_results:
+          path: artifacts/test_results
+      - store_artifacts:
+          path: artifacts/
