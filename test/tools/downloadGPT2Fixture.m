@@ -7,7 +7,7 @@ classdef downloadGPT2Fixture < matlab.unittest.fixtures.Fixture
     % Copyright 2020 The MathWorks, Inc
     
     properties(Constant)
-        GPT2DataDir = fullfile(fileparts(mfilename('fullpath')),'..','..','gpt2-355M')
+        GPT2DataDir = fullfile(getRepoRoot(),'gpt2-355M')
     end
     
     properties
@@ -17,8 +17,10 @@ classdef downloadGPT2Fixture < matlab.unittest.fixtures.Fixture
     methods
         function setup(this)
             this.DataDirExists = exist(this.GPT2DataDir,'dir')==7;
-            if ~this.DataDirExists                
-                gpt2.download();
+            if ~this.DataDirExists
+                % Call this in eval to capture and drop any standard output
+                % that we don't want polluting the test logs.
+                eval('gpt2.download();');
             end
         end
         
