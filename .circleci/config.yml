@@ -13,7 +13,8 @@ jobs:
           release: R2020a
       - matlab/run-tests:
           test-results-junit: artifacts/test_results/matlab/results.xml
-          source-folder: .
+          # Have to add test/tools to the path for certain tests.
+          source-folder: .;test/tools
       - store_test_results:
           path: artifacts/test_results
       - store_artifacts:
