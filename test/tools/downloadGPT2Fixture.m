@@ -20,7 +20,7 @@ classdef downloadGPT2Fixture < matlab.unittest.fixtures.Fixture
             if ~this.DataDirExists
                 % Call this in eval to capture and drop any standard output
                 % that we don't want polluting the test logs.
-                eval('gpt2.download();');
+                evalc('gpt2.download();');
             end
         end
         
