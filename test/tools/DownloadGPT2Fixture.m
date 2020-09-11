@@ -1,5 +1,5 @@
-classdef downloadGPT2Fixture < matlab.unittest.fixtures.Fixture
-    % downloadGPT2Fixture   A fixture for calling gpt2.download if
+classdef DownloadGPT2Fixture < matlab.unittest.fixtures.Fixture
+    % DownloadGPT2Fixture   A fixture for calling gpt2.download if
     % necessary. This is to ensure that this function is only called once
     % and only when tests need it. It also provides a teardown to return
     % the test environment to the expected state before testing.

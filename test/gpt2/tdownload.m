@@ -1,4 +1,4 @@
-classdef(SharedTestFixtures = {downloadGPT2Fixture}) tdownload < matlab.unittest.TestCase
+classdef(SharedTestFixtures = {DownloadGPT2Fixture}) tdownload < matlab.unittest.TestCase
     % tdownload   Tests for gpt2.download
     
     % Copyright 2020 The MathWorks, Inc.

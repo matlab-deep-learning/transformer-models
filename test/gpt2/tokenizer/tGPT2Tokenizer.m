@@ -1,4 +1,4 @@
-classdef(SharedTestFixtures = {downloadGPT2Fixture}) tGPT2Tokenizer < matlab.unittest.TestCase
+classdef(SharedTestFixtures = {DownloadGPT2Fixture}) tGPT2Tokenizer < matlab.unittest.TestCase
     % tGPT2Tokenizer   Tests for the text encoder class
     
     % Copyright 2020 The MathWorks, Inc.
