@@ -13,6 +13,6 @@ function Z = convolution1d(X, W, b)
 %   Output:
 %       Z   - A numOutputFeatures-by-numInputSubwords array.
 
-Z = W*X + b;
+Z = dlmtimes(W,X) + b;
 
 end

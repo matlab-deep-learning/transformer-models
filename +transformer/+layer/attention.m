@@ -52,9 +52,9 @@ C = transformer.layer.convolution1d( X, ...
 
 % Split the results into Q (Query), K (Keys) and V (Values).
 splitSize = size(C,1)/3;
-Q = C(1:splitSize,:);
-K = C((splitSize+1):(2*splitSize),:);
-V = C((2*splitSize+1):(3*splitSize),:);
+Q = C(1:splitSize,:,:);
+K = C((splitSize+1):(2*splitSize),:,:);
+V = C((2*splitSize+1):(3*splitSize),:,:);
 
 % Split heads
 Q = iSplitHeads(Q, splitSize, hyperParameters.NumHeads);
@@ -63,8 +63,8 @@ V = iSplitHeads(V, splitSize, hyperParameters.NumHeads);
 
 % Use the past
 if ~isempty(past)
-    PK = past(:,:,:,1);
-    PV = past(:,:,:,2);
+    PK = permute(past(:,:,:,1,:), [1 2 3 5 4]);
+    PV = permute(past(:,:,:,2,:), [1 2 3 5 4]);
     K = cat(2,PK,K);
     V = cat(2,PV,V);
 end
@@ -72,7 +72,8 @@ end
 % Set present. Note that this is done differently from the original
 % implementation which sets the value of present before the previous if
 % statement.
-present = cat(4,K,V);
+present = cat(5,K,V);
+present = permute(present, [1 2 3 5 4]);
 
 A = transformer.layer.multiheadAttention(Q,K,V);
 
@@ -89,15 +90,15 @@ function Z = iSplitHeads(X, splitSize, numHeads)
 % can use batched matrix multiplication to compute attention for all of the
 % heads at once.
 %
-% X     - A (numFeatures*numHeads)-by-numSubwords array.
-% Z     - A numFeatures-by-numSubwords-by-numHeads array.
-X = reshape(X, splitSize/numHeads, numHeads, []);
-Z = permute(X,[1 3 2]);
+% X     - A (numFeatures*numHeads)-by-numSubwords-by-numObs array.
+% Z     - A numFeatures-by-numSubwords-by-numHeads-by-numObs array.
+X = reshape(X, splitSize/numHeads, numHeads, [], size(X,3));
+Z = permute(X,[1 3 2 4]);
 end
 
 function Z = iMergeHeads(X)
-% X     - A numFeatures-by-numSubwords-by-numHeads array.
-% Z     - A (numFeatures*numHeads)-by-numSubwords array.
-X = permute(X, [1 3 2]);
-Z = reshape(X, size(X,1)*size(X,2), []);
+% X     - A numFeatures-by-numSubwords-by-numHeads-by-numObs array.
+% Z     - A (numFeatures*numHeads)-by-numSubwords-by-numObs array.
+X = permute(X, [1 3 2 4]);
+Z = reshape(X, size(X,1)*size(X,2), [], size(X,4));
 end

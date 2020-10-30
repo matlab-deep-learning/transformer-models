@@ -5,12 +5,12 @@ function Z = normalization(X, g, b)
 %   Layer normzalization is described in [1].
 %
 %   Inputs:
-%       X - A numFeatures-by-numInputSubwords input array.
+%       X - A numFeatures-by-numInputSubwords-by-numObs input array.
 %       g - A numFeatures-by-1 weight vector.
 %       b - A numFeatures-by-1 bias vector.
 %
 %   Outputs:
-%       Z - A numFeatures-by-numInputSubwords output array.
+%       Z - A numFeatures-by-numInputSubwords-by-numObs output array.
 %
 %   References:
 %
