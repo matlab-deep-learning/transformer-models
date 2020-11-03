@@ -1,4 +1,6 @@
 # Transformer Models for MATLAB
+[![CircleCI](https://img.shields.io/circleci/build/github/matlab-deep-learning/transformer-models?label=tests)](https://app.circleci.com/pipelines/github/matlab-deep-learning/transformer-models)
+
 This repository implements deep learning transformer models in MATLAB.
 
 ## Requirements
