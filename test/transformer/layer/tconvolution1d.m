@@ -18,7 +18,7 @@ classdef tconvolution1d < matlab.unittest.TestCase
             b = dlarray(Input.b);
             z_exp = fullyconnect(x,W,b,'DataFormat','CBT');
             z_act = test.convolution1d(x,W,b);
-            test.verifyEqual(z_act, z_exp, 'AbsTol', 1e-10);
+            test.verifyEqual(extractdata(z_act), extractdata(z_exp), 'AbsTol', 1e-10);
         end
     end
 end
