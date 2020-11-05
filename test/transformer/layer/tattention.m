@@ -86,26 +86,18 @@ classdef tattention < matlab.unittest.TestCase
             % Verify the expected value of past - it is the key and values
             % concatenated on the 4th dimension.
             [~,K,V] = iSplitQKV(x,hyperParams.NumHeads,latentDim);
-            K = reshape(K, [size(K, 1:3) 1 size(K, 4)]);
-            V = reshape(V, [size(V, 1:3) 1 size(V, 4)]);
-            test.verifyEqual(past,cat(4,K,V));
+            test.verifyEqual(past,cat(5,K,V));
             % Now verify second call to attention is possible with the first 
             % past as input - and verify the value of the attention output.
             [yAct,present] = test.attention(x,past,weights,hyperParams);
             [Q,K,V] = iSplitQKV(x,hyperParams.NumHeads,latentDim);
-            Q = reshape(Q, [size(Q, 1:3) 1 size(Q, 4)]);
-            K = reshape(K, [size(K, 1:3) 1 size(K, 4)]);
-            V = reshape(V, [size(V, 1:3) 1 size(V, 4)]);
             % Verify the correct value for present.
-            pastK = past(:,:,:,1,:);
-            pastV = past(:,:,:,2,:);
-            test.verifyEqual(extractdata(present),extractdata(cat(4,cat(2,pastK,K),cat(2,pastV,V))),'AbsTol',1e-5);
+            pastK = past(:,:,:,:,1);
+            pastV = past(:,:,:,:,2);
+            test.verifyEqual(extractdata(present),extractdata(cat(5,cat(2,pastK,K),cat(2,pastV,V))),'AbsTol',1e-5);
             % To compute the expected value, concatenate the pasts
             K = cat(2,K,pastK);
             V = cat(2,V,pastV);
-            Q = permute(Q, [1 2 3 5 4]);
-            K = permute(K, [1 2 3 5 4]);
-            V = permute(V, [1 2 3 5 4]);
             yExp = test.multiheadAttention(Q,K,V);
             yExp = iMergeHeads(yExp);
             test.verifyEqual(extractdata(yAct),extractdata(yExp),'AbsTol',1e-5);
