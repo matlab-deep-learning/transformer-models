@@ -37,7 +37,7 @@ classdef tblock < matlab.unittest.TestCase
             % Provide a fake past of sequence length 1
             K_fake = dlarray(rand(C,1));
             V_fake = dlarray(rand(C,1));
-            past = cat(4,K_fake,V_fake);
+            past = cat(5,K_fake,V_fake);
             [y,present] = test.block(x,past,weights,hyperParameters);
             test.verifySize(y,size(x));
             % The size of presents is the size of past except the sequence
