@@ -10,14 +10,12 @@ function A = multiheadAttention(Q, K, V)
 %   below for details.
 %
 %   Inputs:
-%       Q   - A numFeatures-by-numInputSubWords-by-numHeads array of
-%             queries.
-%       K   - A numFeatures-by-numAllSubWords-by-numHeads array of keys.
-%       V   - A numFeatures-by-numAllSubWords-by-numHeads array of values.
+%       Q   - numFeatures-by-numInputSubWords-by-numHeads-by-numObs array of queries.
+%       K   - numFeatures-by-numAllSubWords-by-numHeads-by-numObs array of keys.
+%       V   - numFeatures-by-numAllSubWords-by-numHeads-by-numObs array of values.
 %
 %   Outputs:
-%       A   - A numFeatures-by-numInputSubWords-by-numHeads array of
-%             attention matrices.
+%       A   - numFeatures-by-numInputSubWords-by-numHeads-by-numObs array of attention matrices.
 %
 %   References:
 %
@@ -29,7 +27,7 @@ function A = multiheadAttention(Q, K, V)
 % matrices. W is numAllSubWords-by-numInputSubWords-by-numHeads. Each
 % element of W is the dot product of a query vector from Q and a key vector
 % from K.
-W = dlmtimes(permute(K, [2 1 3]), Q);
+W = dlmtimes(permute(K, [2 1 3 4]), Q);
 
 % Divide by square root of d
 W = W./sqrt(size(Q,1));
@@ -38,7 +36,7 @@ W = W./sqrt(size(Q,1));
 W = transformer.layer.maskAttentionWeights(W);
 
 % Apply softmax
-W = softmax(W, 'DataFormat', 'CTB');
+W = softmax(W, 'DataFormat', 'CTUB');
 
 % We compute the attention by taking products between the attention weights
 % W and V. A is numFeatures-by-numInputSubWords-by-numHeads. One

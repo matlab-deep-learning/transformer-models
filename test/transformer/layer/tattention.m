@@ -16,10 +16,11 @@ classdef tattention < matlab.unittest.TestCase
     
     properties(TestParameter)
         NumQueries = {1,2}
+        NumObs = {1,3}
     end
     
     methods(Test)
-        function checkSingleHeadNoFullyConnected(test,NumQueries)
+        function checkSingleHeadNoFullyConnected(test,NumQueries,NumObs)
             % Verify that multiheadAttention is used.
             % Do this by setting the fully connected weights to identity
             % and the bias to 0.
@@ -31,16 +32,20 @@ classdef tattention < matlab.unittest.TestCase
             % be 0.
             weights = test.prepareWeightsStructWithIdentityFC(hyperParams.NumHeads,latentDim);
             % Call attention on an arbitrary input.
-            x = dlarray(rand(latentDim*3,NumQueries));
+            x = dlarray(rand(latentDim*3,NumQueries,NumObs));
             yAct = test.attention(x,past,weights,hyperParams);
             % Verify against multiheadAttention by splitting the arbitrary
             % input into query, key and value.
             [q,k,v] = iSplitQKV(x,hyperParams.NumHeads,latentDim);
             yExp = test.multiheadAttention(q,k,v);
+            % Note that for numObs > 1 we need to merge heads. Since we
+            % have a single head here, no merger needs to take place -- we
+            % just need to permute the observation dimension from 4 to 3
+            yExp = permute(yExp, [1 2 4 3]);
             test.verifyEqual(yAct,yExp);
         end
         
-        function checkMultiHeadNoFullyConnected(test,NumQueries)
+        function checkMultiHeadNoFullyConnected(test,NumQueries,NumObs)
             % Verify the multiple head case. Multi head attention is
             % achieved by simply creating a "head dimension" and pushing it
             % to the back so that it is treated as a "batch"
@@ -52,7 +57,7 @@ classdef tattention < matlab.unittest.TestCase
             % be 0. 
             weights = test.prepareWeightsStructWithIdentityFC(hyperParams.NumHeads,latentDim);
             % Call attention on an arbitrary input.
-            x = dlarray(rand(latentDim*hyperParams.NumHeads*3,NumQueries));
+            x = dlarray(rand(latentDim*hyperParams.NumHeads*3,NumQueries,NumObs));
             yAct = test.attention(x,past,weights,hyperParams);
             [Q,K,V] = iSplitQKV(x,hyperParams.NumHeads,latentDim);
             % Verify against the multiheadAttention function.
@@ -61,7 +66,7 @@ classdef tattention < matlab.unittest.TestCase
             test.verifyEqual(yAct,yExp);
         end
         
-        function checkPastPresentCaching(test,NumQueries)
+        function checkPastPresentCaching(test,NumQueries,NumObs)
             % Verify the 2nd input and output of attention - the pasts
             % passed in are the keys and values for the previous time step.
             % These are concatenated to the keys and values for the current
@@ -76,20 +81,20 @@ classdef tattention < matlab.unittest.TestCase
             % be 0. 
             weights = test.prepareWeightsStructWithIdentityFC(hyperParams.NumHeads,latentDim);
             % Call attention on an arbitrary input.
-            x = dlarray(rand(latentDim*hyperParams.NumHeads*3,NumQueries));
+            x = dlarray(rand(latentDim*hyperParams.NumHeads*3,NumQueries,NumObs));
             [~,past] = test.attention(x,past,weights,hyperParams);
             % Verify the expected value of past - it is the key and values
             % concatenated on the 4th dimension.
             [~,K,V] = iSplitQKV(x,hyperParams.NumHeads,latentDim);
-            test.verifyEqual(past,cat(4,K,V));
+            test.verifyEqual(past,cat(5,K,V));
             % Now verify second call to attention is possible with the first 
             % past as input - and verify the value of the attention output.
             [yAct,present] = test.attention(x,past,weights,hyperParams);
             [Q,K,V] = iSplitQKV(x,hyperParams.NumHeads,latentDim);
             % Verify the correct value for present.
-            pastK = past(:,:,:,1);
-            pastV = past(:,:,:,2);
-            test.verifyEqual(extractdata(present),extractdata(cat(4,cat(2,pastK,K),cat(2,pastV,V))),'AbsTol',1e-5);
+            pastK = past(:,:,:,:,1);
+            pastV = past(:,:,:,:,2);
+            test.verifyEqual(extractdata(present),extractdata(cat(5,cat(2,pastK,K),cat(2,pastV,V))),'AbsTol',1e-5);
             % To compute the expected value, concatenate the pasts
             K = cat(2,K,pastK);
             V = cat(2,V,pastV);
@@ -98,7 +103,7 @@ classdef tattention < matlab.unittest.TestCase
             test.verifyEqual(extractdata(yAct),extractdata(yExp),'AbsTol',1e-5);
         end
         
-        function checkInputOutputFC(test,NumQueries)
+        function checkInputOutputFC(test,NumQueries,NumObs)
             % The tests above ensure multiheadAttention is used by
             % attention. Now verify the input and output FC operations are
             % used.
@@ -108,14 +113,14 @@ classdef tattention < matlab.unittest.TestCase
             past = [];
             params = test.prepareWeightsStructUsingGenerators(hyperParams.NumHeads,latentDim,@randn,@randn);
             % Call attention on an arbitrary input.
-            x = dlarray(rand(latentDim*hyperParams.NumHeads*3,NumQueries));
+            x = dlarray(rand(latentDim*hyperParams.NumHeads*3,NumQueries,NumObs));
             yAct = test.attention(x,past,params,hyperParams);
             % Verify this matches the full attention implementation
-            z = fullyconnect(x,params.attn_c_attn_w_0,params.attn_c_attn_b_0,'DataFormat','CTB');
+            z = fullyconnect(x,params.attn_c_attn_w_0,params.attn_c_attn_b_0,'DataFormat','CBT');
             [Q,K,V] = iSplitQKV(z,hyperParams.NumHeads,latentDim);
             z = test.multiheadAttention(Q,K,V);
             z = iMergeHeads(z);
-            yExp = fullyconnect(z,params.attn_c_proj_w_0,params.attn_c_proj_b_0,'DataFormat','CTB');
+            yExp = fullyconnect(z,params.attn_c_proj_w_0,params.attn_c_proj_b_0,'DataFormat','CBT');
             test.verifyEqual(extractdata(yAct),extractdata(yExp),'AbsTol',1e-5);
         end
     end
@@ -132,7 +137,7 @@ classdef tattention < matlab.unittest.TestCase
         end
         
         function s = prepareWeightsStructUsingGenerators(test,nHeads,latentDim,weightGenerator,biasGenerator)
-            % Use function hadnles weightGenerator and biasGenerator to
+            % Use function handles weightGenerator and biasGenerator to
             % create weight and bias values for the fc layers in attention.
             % The expectation is these function handles map a size vector
             % to an array of that size.
@@ -165,17 +170,17 @@ end
 function [Q,K,V] = iSplitQKV(X, nHeads, latentDim)
 % Split an input array X into the corresponding Q, K and V arrays.
 splitSize = latentDim*nHeads;
-Q = iSplitHeads(X(1:splitSize,:),splitSize,nHeads);
-K = iSplitHeads(X((splitSize+1):2*splitSize,:),splitSize,nHeads);
-V = iSplitHeads(X((2*splitSize+1):3*splitSize,:),splitSize,nHeads);
+Q = iSplitHeads(X(1:splitSize,:,:),splitSize,nHeads);
+K = iSplitHeads(X((splitSize+1):2*splitSize,:,:),splitSize,nHeads);
+V = iSplitHeads(X((2*splitSize+1):3*splitSize,:,:),splitSize,nHeads);
 end
 
 function X = iSplitHeads(X, splitSize, numHeads)
-X = reshape(X, splitSize/numHeads, numHeads, []);   % Split states
-X = permute(X,[1 3 2]);
+X = reshape(X, splitSize/numHeads, numHeads, [], size(X,3));   % Split states
+X = permute(X,[1 3 2 4]);
 end
 
 function X = iMergeHeads(X)
-X = permute(X, [1 3 2]);
-X = reshape(X, size(X,1)*size(X,2), []);            % Merge states
+X = permute(X, [1 3 2 4]);
+X = reshape(X, size(X,1)*size(X,2), [], size(X,4));            % Merge states
 end
