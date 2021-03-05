@@ -1,7 +1,7 @@
 classdef tmultiheadAttention < matlab.unittest.TestCase
     % tmultiheadAttention   Tests for transformer.layer.multiheadAttention
     
-    % Copyright 2020 THe MathWorks, Inc.
+    % Copyright 2020 The MathWorks, Inc.
     
     % Multi-head attention (https://arxiv.org/abs/1706.03762) simply
     % computes a scaled dot product between a query-vector q against a
@@ -101,31 +101,30 @@ classdef tmultiheadAttention < matlab.unittest.TestCase
             end
         end
         
-        function canBeBatched(test)
-            % Verify multiheadAttention works with batches, independently
-            % across a batch.
+        function multipleHeads(test)
+            % Verify multiheadAttention works with multiple attention heads
             keyDim = 3;
             valDim = 7;
             numKeys = 4;
             numQueries = 5;
-            batchSize = 6;
-            Q = dlarray(rand(keyDim,numQueries,batchSize));
-            K = dlarray(rand(keyDim,numKeys,batchSize));
-            V = dlarray(rand(valDim,numKeys,batchSize));
+            numHeads = 6;
+            Q = dlarray(rand(keyDim,numQueries,numHeads));
+            K = dlarray(rand(keyDim,numKeys,numHeads));
+            V = dlarray(rand(valDim,numKeys,numHeads));
             attnAct = test.multiheadAttention(Q,K,V);
-            attnExp = dlarray(zeros(valDim,numQueries,batchSize));
-            for b = 1:batchSize
-                attnScores = test.scaledDotProduct(Q(:,:,b),K(:,:,b));
+            attnExp = dlarray(zeros(valDim,numQueries,numHeads));
+            for h = 1:numHeads
+                attnScores = test.scaledDotProduct(Q(:,:,h),K(:,:,h));
                 for i = 0:(numQueries-1)
                     maskedAttnScores = attnScores(1:(end-i),numQueries-i);
                     maskedAttnScores = cat(1,maskedAttnScores,-1e10*dlarray(ones(i,1)));
                     probs = softmax(maskedAttnScores,'DataFormat','CT');
-                    attnExp(:,numQueries-i,b) = V(:,:,b)*probs;
+                    attnExp(:,numQueries-i,h) = V(:,:,h)*probs;                    
                 end
             end
             test.verifyDlarrayEqual(attnAct,attnExp,'AbsTol',test.Tolerance);
-        end
-        
+        end        
+
         function defaultIsMasked(test)
             % Verify the 'CausalMask' NVP
             keyDim = 3;
@@ -192,6 +191,26 @@ classdef tmultiheadAttention < matlab.unittest.TestCase
             A_exp = test.multiheadAttention(Q,K,V,'Dropout',0);
             test.verifyEqual(A_default,A_exp);
         end
+        
+        function multipleObservations(test)
+            % Verify multiheadAttention works with batches, i.e. across
+            % independent observations in a single batch
+            keyDim = 3;
+            valDim = 7;
+            numKeys = 4;
+            numQueries = 5;
+            numHeads = 6;
+            numObs = 2;
+            Q = dlarray(rand(keyDim,numQueries,numHeads,numObs));
+            K = dlarray(rand(keyDim,numKeys,numHeads,numObs));
+            V = dlarray(rand(valDim,numKeys,numHeads,numObs));
+            attnAct = test.multiheadAttention(Q,K,V);
+            attnExp = dlarray(zeros(valDim,numQueries,numHeads,numObs));
+            for n = 1:numObs
+                attnExp(:,:,:,n) = test.multiheadAttention(Q(:,:,:,n),K(:,:,:,n),V(:,:,:,n));
+            end
+            test.verifyDlarrayEqual(attnAct,attnExp,'AbsTol',test.Tolerance);
+        end
     end
     
     methods(Access=private)
@@ -215,5 +234,4 @@ classdef tmultiheadAttention < matlab.unittest.TestCase
             test.verifyEqual(extractdata(x),extractdata(y),varargin{:});
         end
     end
-    
 end

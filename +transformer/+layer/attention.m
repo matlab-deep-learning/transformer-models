@@ -6,14 +6,14 @@ function [A, present] = attention(X, past, weights, hyperParameters, nvp)
 %   2 in [1]. See below for details of inputs and outputs.
 %
 %   Inputs:
-%       X               - A (numFeatures*numHeads)-by-numInputSubwords
+%       X               - A (numFeatures*numHeads)-by-numInputSubwords-by-numObs
 %                         input array.
-%       past            - A numFeatures-by-numPastSubwords-by-numHeads-by-2
+%       past            - A numFeatures-by-numPastSubwords-by-numHeads-by-numObs-by-2
 %                         array. This contains the 'keys' and 'values' for
 %                         past subwords. These are needed to predict future
 %                         outputs in an autoregressive manner. 'keys' are
-%                         stored in past(:,:,:,1) and 'values' are stored
-%                         in past(:,:,:,2).
+%                         stored in past(:,:,:,:,1) and 'values' are stored
+%                         in past(:,:,:,:,2).
 %       weights         - The weights for the full multi-head attention
 %                         block stored in a struct. This includes:
 %                           - attn_c_attn_w_0: A weight matrix for the
@@ -28,15 +28,15 @@ function [A, present] = attention(X, past, weights, hyperParameters, nvp)
 %                         hyper-parameter.
 %
 %   Outputs:
-%       Z               - A (numFeatures*numHeads)-by-numInputSubwords
+%       Z               - A (numFeatures*numHeads)-by-numInputSubwords-by-numObs
 %                         output array.
-%       present         - A numFeatures-by-numAllSubwords-by-numHeads-by-2
+%       present         - A numFeatures-by-numAllSubwords-by-numHeads-by-numObs-by-2
 %                         array. This contains the 'keys' and 'values' that
 %                         are created from inputs. These need to passed
 %                         back in as the 'past' input if we want to predict
 %                         future outputs in an autoregressive manner. 'keys'
-%                         are stored in present(:,:,:,1) and 'values' are
-%                         stored in present(:,:,:,2).
+%                         are stored in present(:,:,:,:,1) and 'values' are
+%                         stored in present(:,:,:,:,2).
 %
 %   [A, present] = attention(X, past, weights, hyperParameters, 'PARAM1',
 %   VAL1, 'PARAM2', VAL2, ...) specifies the optional parameter name/value
@@ -87,16 +87,16 @@ V = iSplitHeads(V, splitSize, hyperParameters.NumHeads);
 
 % Use the past
 if ~isempty(past)
-    PK = past(:,:,:,1);
-    PV = past(:,:,:,2);
+    PK = past(:,:,:,:,1);
+    PV = past(:,:,:,:,2);
     K = cat(2,PK,K);
     V = cat(2,PV,V);
 end
 
 % Set present. Note that this is done differently from the original
 % implementation which sets the value of present before the previous if
-% statement.
-present = cat(4,K,V);
+% statement
+present = cat(5,K,V);
 
 A = transformer.layer.multiheadAttention(Q,K,V,'CausalMask',nvp.CausalMask,'Dropout',nvp.Dropout,'InputMask',nvp.InputMask);
 
@@ -112,15 +112,15 @@ function Z = iSplitHeads(X, splitSize, numHeads)
 % can use batched matrix multiplication to compute attention for all of the
 % heads at once.
 %
-% X     - A (numFeatures*numHeads)-by-numSubwords array.
-% Z     - A numFeatures-by-numSubwords-by-numHeads array.
+% X     - A (numFeatures*numHeads)-by-numSubwords-by-numObs array.
+% Z     - A numFeatures-by-numSubwords-by-numHeads-by-numObs array.
 X = reshape(X, splitSize/numHeads, numHeads, [], size(X,3));
 Z = permute(X,[1 3 2 4]);
 end
 
 function Z = iMergeHeads(X)
-% X     - A numFeatures-by-numSubwords-by-numHeads array.
-% Z     - A (numFeatures*numHeads)-by-numSubwords array.
+% X     - A numFeatures-by-numSubwords-by-numHeads-by-numObs array.
+% Z     - A (numFeatures*numHeads)-by-numSubwords-by-numObs array.
 X = permute(X, [1 3 2 4]);
 Z = reshape(X, size(X,1)*size(X,2), [], size(X,4));
 end

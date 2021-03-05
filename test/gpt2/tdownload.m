@@ -12,7 +12,9 @@ classdef(SharedTestFixtures = {DownloadGPT2Fixture}) tdownload < matlab.unittest
     
     methods(Test)
         function verifyFilesExist(test)
-            files = dir(gpt2.internal.getSupportFilePath(''));
+            aFile = gpt2.internal.getSupportFilePath('gpt2_vocab.bpe');
+            directory = fileparts(aFile);
+            files = dir(directory);
             filenames = {files.name};
             % Check that the expected files were downloaded by the fixture.
             % Do not test these are the only files since we now use the

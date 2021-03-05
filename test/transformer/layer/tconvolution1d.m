@@ -16,18 +16,19 @@ classdef tconvolution1d < matlab.unittest.TestCase
             x = dlarray(Input.x);
             W = dlarray(Input.W);
             b = dlarray(Input.b);
-            z_exp = fullyconnect(x,W,b,'DataFormat','CB');
+            z_exp = fullyconnect(x,W,b,'DataFormat','CBT');
             z_act = test.convolution1d(x,W,b);
-            test.verifyEqual(z_act,z_exp);
+            test.verifyEqual(extractdata(z_act), extractdata(z_exp), 'AbsTol', 1e-10);
         end
     end
 end
 
 function s = iInput()
 s = struct(...
-    'OneChannel',iInputCase(1,2,0),...
-    'TwoChannel',iInputCase(ones(2,1),rand(3,2),rand(3,1)),...
-    'MultipleObservations',iInputCase(rand(3,4),rand(5,3),rand(5,1)));
+    'OneC',iInputCase(1,2,0),...
+    'TwoC',iInputCase(ones(2,1),rand(3,2),rand(3,1)),...
+    'CT',iInputCase(rand(3,4),rand(5,3),rand(5,1)), ...
+    'CBT',iInputCase(rand(3,4,2),rand(5,3),rand(5,1)));
 end
 
 function s = iInputCase(x,w,b)

@@ -10,14 +10,12 @@ function A = multiheadAttention(Q, K, V,nvp)
 %   below for details.
 %
 %   Inputs:
-%       Q   - A numFeatures-by-numInputSubWords-by-numHeads array of
-%             queries.
-%       K   - A numFeatures-by-numAllSubWords-by-numHeads array of keys.
-%       V   - A numFeatures-by-numAllSubWords-by-numHeads array of values.
+%       Q   - numFeatures-by-numInputSubWords-by-numHeads-by-numObs array of queries.
+%       K   - numFeatures-by-numAllSubWords-by-numHeads-by-numObs array of keys.
+%       V   - numFeatures-by-numAllSubWords-by-numHeads-by-numObs array of values.
 %
 %   Outputs:
-%       A   - A numFeatures-by-numInputSubWords-by-numHeads array of
-%             attention matrices.
+%       A   - numFeatures-by-numInputSubWords-by-numHeads-by-numObs array of attention matrices.
 %
 %   A = multiheadAttention(Q, K, V, 'PARAM1', VAL1, 'PARAM2', VAL2, ...)
 %   specifies the optional parameter name/value pairs:
