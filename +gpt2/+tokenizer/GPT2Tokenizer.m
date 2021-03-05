@@ -66,10 +66,11 @@ classdef GPT2Tokenizer < handle
     end
     
     methods
-        function this = GPT2Tokenizer(modelName, modelsDirectory)
+        function this = GPT2Tokenizer(~, ~)
             % Read in the vocabulary. The UTF-8 part is really important to
             % make this work on Windows.
-            fid = fopen([modelsDirectory filesep() modelName filesep() 'vocab.bpe'], 'r', 'n', 'UTF-8');
+            vocabFile = gpt2.internal.getSupportFilePath("gpt2_vocab.bpe");
+            fid = fopen(vocabFile, 'r', 'n', 'UTF-8');
             bpeData = textscan(fid,'%s', 'Delimiter', '\n');
             fclose(fid);
             
@@ -81,7 +82,8 @@ classdef GPT2Tokenizer < handle
             
             % Read in the encoding data. The UTF-8 part is really important
             % to make this work on Windows.
-            fid = fopen([modelsDirectory filesep() modelName filesep() 'encoder.txt'], 'r', 'n', 'UTF-8');
+            encoderFile = gpt2.internal.getSupportFilePath("gpt2_encoder.txt");
+            fid = fopen(encoderFile, 'r', 'n', 'UTF-8');
             encoderData = textscan(fid,'%s', 'Delimiter', '\n');
             fclose(fid);
             

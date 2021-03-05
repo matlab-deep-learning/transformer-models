@@ -1,4 +1,4 @@
-function [A, present] = attention(X, past, weights, hyperParameters)
+function [A, present] = attention(X, past, weights, hyperParameters, nvp)
 % attention   Full Multi-head Attention
 %
 %   [A, present] = attention(X, past, weights, hyperParameters) computes a
@@ -38,11 +38,35 @@ function [A, present] = attention(X, past, weights, hyperParameters)
 %                         are stored in present(:,:,:,1) and 'values' are
 %                         stored in present(:,:,:,2).
 %
+%   [A, present] = attention(X, past, weights, hyperParameters, 'PARAM1',
+%   VAL1, 'PARAM2', VAL2, ...) specifies the optional parameter name/value
+%   pairs:
+%
+%     'CausalMask'  - A scalar logical to turn causal masking on or off. Causal
+%                     masking prevents tokens at time T attending to tokens
+%                     at time S<T. The default is true.
+%
+%     'Dropout'     - The dropout probability for the attention
+%                     probabilities. The default is 0.
+%
+%     'InputMask'   - A logical mask to mask attending to particular
+%                     tokens, for example padding tokens. The default is
+%                     [], interpreted as not applying any masking.
+%
 %   References:
 %
 %   [1] Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion
 %       Jones, Aidan N. Gomez, Lukasz Kaiser, Illia Polosukhin, "Attention
 %       Is All You Need", https://arxiv.org/abs/1706.03762
+arguments
+    X
+    past
+    weights
+    hyperParameters
+    nvp.CausalMask (1,1) logical = true
+    nvp.Dropout (1,1) double {mustBeNonnegative,mustBeLessThanOrEqual(nvp.Dropout,1)} = 0
+    nvp.InputMask = []
+end
 
 % Use a fully connected layer to generate queries, keys and values from the
 % input.
@@ -52,9 +76,9 @@ C = transformer.layer.convolution1d( X, ...
 
 % Split the results into Q (Query), K (Keys) and V (Values).
 splitSize = size(C,1)/3;
-Q = C(1:splitSize,:);
-K = C((splitSize+1):(2*splitSize),:);
-V = C((2*splitSize+1):(3*splitSize),:);
+Q = C(1:splitSize,:,:);
+K = C((splitSize+1):(2*splitSize),:,:);
+V = C((2*splitSize+1):(3*splitSize),:,:);
 
 % Split heads
 Q = iSplitHeads(Q, splitSize, hyperParameters.NumHeads);
@@ -74,14 +98,13 @@ end
 % statement.
 present = cat(4,K,V);
 
-A = transformer.layer.multiheadAttention(Q,K,V);
+A = transformer.layer.multiheadAttention(Q,K,V,'CausalMask',nvp.CausalMask,'Dropout',nvp.Dropout,'InputMask',nvp.InputMask);
 
 A = iMergeHeads(A);
 
 A = transformer.layer.convolution1d( A, ...
     weights.attn_c_proj_w_0, ...
     weights.attn_c_proj_b_0 );
-
 end
 
 function Z = iSplitHeads(X, splitSize, numHeads)
@@ -91,13 +114,13 @@ function Z = iSplitHeads(X, splitSize, numHeads)
 %
 % X     - A (numFeatures*numHeads)-by-numSubwords array.
 % Z     - A numFeatures-by-numSubwords-by-numHeads array.
-X = reshape(X, splitSize/numHeads, numHeads, []);
-Z = permute(X,[1 3 2]);
+X = reshape(X, splitSize/numHeads, numHeads, [], size(X,3));
+Z = permute(X,[1 3 2 4]);
 end
 
 function Z = iMergeHeads(X)
 % X     - A numFeatures-by-numSubwords-by-numHeads array.
 % Z     - A (numFeatures*numHeads)-by-numSubwords array.
-X = permute(X, [1 3 2]);
-Z = reshape(X, size(X,1)*size(X,2), []);
+X = permute(X, [1 3 2 4]);
+Z = reshape(X, size(X,1)*size(X,2), [], size(X,4));
 end

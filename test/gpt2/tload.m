@@ -16,7 +16,7 @@ classdef(SharedTestFixtures = {DownloadGPT2Fixture}) tload < matlab.unittest.Tes
     methods(TestClassSetup)
         function loadParameters(test)
             % Load the parameters once for all tests
-            test.Parameters = gpt2.load(fullfile(getRepoRoot,"gpt2-355M","parameters.mat"));
+            test.Parameters = gpt2.load(gpt2.internal.getSupportFilePath('gpt2_355M_params.mat'));
         end
     end
     
