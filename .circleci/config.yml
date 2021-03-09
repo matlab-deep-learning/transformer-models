@@ -1,6 +1,6 @@
 version: 2.1
 orbs:
-  matlab: mathworks/matlab@0.2.0
+  matlab: mathworks/matlab@0.4.0
 
 jobs:
   build:
@@ -9,8 +9,7 @@ jobs:
     steps:
       - checkout
       - matlab/install:
-          # We want to ensure the repo works in R2020a
-          release: R2020a
+          release: R2021a
       - matlab/run-tests:
           test-results-junit: artifacts/test_results/matlab/results.xml
           # Have to add test/tools to the path for certain tests.
