@@ -31,7 +31,7 @@ classdef DownloadFinBERTFixture < matlab.unittest.fixtures.Fixture
             for i=1:numel(this.Models)
                 model = this.Models(i);
                 if ~this.DataDirExists(model)
-                    rmdir(fullfile(getRepoRoot(),model),'s');
+                    rmdir(this.pathToSupportFile(model),'s');
                 end
             end
         end
