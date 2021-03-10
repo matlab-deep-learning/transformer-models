@@ -28,13 +28,13 @@ Download or [clone](https://www.mathworks.com/help/matlab/matlab_prog/use-source
 ### bert.model
 `Z = bert.model(X,parameters)` performs inference with a BERT model on the input `1`-by-`numInputTokens`-by-`numObservations` array of encoded tokens with the specified parameters. The output `Z` is an array of size (`NumHeads*HeadSize`)-by-`numInputTokens`-by-`numObservations`. The element `Z(:,i,j)` corresponds to the BERT embedding of input token `X(1,i,j)`.
 
-`Z = bert.model(X,parameters,Name,Value)` specifies additional optionals using one or more name-value pairs:
+`Z = bert.model(X,parameters,Name,Value)` specifies additional options using one or more name-value pairs:
 - `"PaddingCode"` - Positive integer corresponding to the padding token. The default is `1`.
 - `"InputMask"` - Mask indicating which elements to include for computation, specified as a logical array the same size as `X` or as an empty array. The mask must be false at indices positions corresponds to padding, and true elsewhere. If the mask is `[]`, then the function determines padding according to the `PaddingCode` name-value pair. The default is `[]`.
 - `"DropoutProb"` - Probability of dropout for the output activation. The default is `0`.
 - `"AttentionDropoutProb"` - Probability of dropout used in the attention layer. The default is `0`.
 - `"Outputs"` - Indices of the layers to return outputs from, specified as a vector of positive integers, or `"last"`. If `"Outputs"` is `"last"`, then the function returns outputs from the final encoder layer only. The default is `"last"`.
-- `"SeparatorCode"` - Separator token specifed as a positive integer. The default is `103`.
+- `"SeparatorCode"` - Separator token specified as a positive integer. The default is `103`.
 
 ### finbert
 `mdl = finbert` loads a pretrained BERT transformer model for sentiment analysis of financial text. The output `mdl` is structure with fields `Tokenizer` and `Parameters` that contain the BERT tokenizer and the model parameters, respectively.
@@ -75,6 +75,13 @@ The example [`FineTuneBERT.m`](./FineTuneBERT.m) shows how to fine-tune a pretra
 FinBERT is a sentiment analysis model trained on financial text data and fine-tuned for sentiment analysis.
 
 The example [`SentimentAnalysisWithFinBERT.m`](./SentimentAnalysisWithFinBERT.m) shows how to classify the sentiment of financial news reports using a pretrained FinBERT model.
+
+## Example: Predict Masked Tokens Using BERT and FinBERT
+BERT models are trained to perform various tasks. One of the tasks is known as masked language modeling which is the task of predicting tokens in text that have been replaced by a mask value.
+
+The example [`PredictMaskedTokensUsingBERT.m`](./PredictMaskedTokensUsingBERT.m) shows how to predict masked tokens and calculate the token probabilities using a pretrained BERT model.
+
+The example [`PredictMaskedTokensUsingFinBERT.m`](./PredictMaskedTokensUsingFinBERT.m) shows how to predict masked tokens for financial text using and calculate the token probabilities using a pretrained FinBERT model.
 
 ## Example: Summarize Text Using GPT-2
 Transformer networks such as GPT-2 can be used to summarize a piece of text. The trained GPT-2 transformer can generate text given an initial sequence of words as input. The model was trained on comments left on various web pages and internet forums.
