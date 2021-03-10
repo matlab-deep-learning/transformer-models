@@ -13,7 +13,9 @@ This repository implements deep learning transformer models in MATLAB.
 - Deep Learning Toolbox
 
 ## Getting Started
-Download or [clone](https://www.mathworks.com/help/matlab/matlab_prog/use-source-control-with-projects.html#mw_4cc18625-9e78-4586-9cc4-66e191ae1c2c) this repository to your machine and open it in MATLAB.
+Download or [clone](https://www.mathworks.com/help/matlab/matlab_prog/use-source-control-with-projects.html#mw_4cc18625-9e78-4586-9cc4-66e191ae1c2c) this repository to your machine and open it in MATLAB. 
+
+For R2020a or R2020b download the repo at the corresponding tagged release, or if you are using `git` then `git checkout <release>` where `<release>` is `R2020a` or `R2020b`.
 
 ## Functions
 ### bert
