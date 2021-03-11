@@ -1,7 +1,7 @@
 classdef(SharedTestFixtures = {DownloadGPT2Fixture}) tmodel < matlab.unittest.TestCase
     % tmodel   Tests for gpt2.model
     
-    % Copyright 2020 The MathWorks, Inc.
+    % Copyright 2020-2021 The MathWorks, Inc.
     
     properties(Constant)
         model = @gpt2.model
@@ -57,7 +57,7 @@ classdef(SharedTestFixtures = {DownloadGPT2Fixture}) tmodel < matlab.unittest.Te
         end
         
         function parameters = prepareParameters(~)
-            parametersFile = fullfile(getRepoRoot(),'gpt2-355M','parameters.mat');
+            parametersFile = gpt2.internal.getSupportFilePath("gpt2_355M_params.mat");
             parameters = gpt2.load(parametersFile);
         end
     end

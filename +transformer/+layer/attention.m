@@ -1,4 +1,4 @@
-function [A, present] = attention(X, past, weights, hyperParameters)
+function [A, present] = attention(X, past, weights, hyperParameters, nvp)
 % attention   Full Multi-head Attention
 %
 %   [A, present] = attention(X, past, weights, hyperParameters) computes a
@@ -38,11 +38,35 @@ function [A, present] = attention(X, past, weights, hyperParameters)
 %                         are stored in present(:,:,:,:,1) and 'values' are
 %                         stored in present(:,:,:,:,2).
 %
+%   [A, present] = attention(X, past, weights, hyperParameters, 'PARAM1',
+%   VAL1, 'PARAM2', VAL2, ...) specifies the optional parameter name/value
+%   pairs:
+%
+%     'CausalMask'  - A scalar logical to turn causal masking on or off. Causal
+%                     masking prevents tokens at time T attending to tokens
+%                     at time S<T. The default is true.
+%
+%     'Dropout'     - The dropout probability for the attention
+%                     probabilities. The default is 0.
+%
+%     'InputMask'   - A logical mask to mask attending to particular
+%                     tokens, for example padding tokens. The default is
+%                     [], interpreted as not applying any masking.
+%
 %   References:
 %
 %   [1] Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion
 %       Jones, Aidan N. Gomez, Lukasz Kaiser, Illia Polosukhin, "Attention
 %       Is All You Need", https://arxiv.org/abs/1706.03762
+arguments
+    X
+    past
+    weights
+    hyperParameters
+    nvp.CausalMask (1,1) logical = true
+    nvp.Dropout (1,1) double {mustBeNonnegative,mustBeLessThanOrEqual(nvp.Dropout,1)} = 0
+    nvp.InputMask = []
+end
 
 % Use a fully connected layer to generate queries, keys and values from the
 % input.
@@ -74,7 +98,7 @@ end
 % statement
 present = cat(5,K,V);
 
-A = transformer.layer.multiheadAttention(Q,K,V);
+A = transformer.layer.multiheadAttention(Q,K,V,'CausalMask',nvp.CausalMask,'Dropout',nvp.Dropout,'InputMask',nvp.InputMask);
 
 A = iMergeHeads(A);
 

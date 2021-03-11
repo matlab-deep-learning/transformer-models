@@ -123,6 +123,73 @@ classdef tmultiheadAttention < matlab.unittest.TestCase
                 end
             end
             test.verifyDlarrayEqual(attnAct,attnExp,'AbsTol',test.Tolerance);
+        end        
+
+        function defaultIsMasked(test)
+            % Verify the 'CausalMask' NVP
+            keyDim = 3;
+            valDim = 7;
+            numKeys = 4;
+            numQueries = 5;
+            batchSize = 6;
+            Q = dlarray(rand(keyDim,numQueries,batchSize));
+            K = dlarray(rand(keyDim,numKeys,batchSize));
+            V = dlarray(rand(valDim,numKeys,batchSize));
+            default = test.multiheadAttention(Q,K,V);
+            masked = test.multiheadAttention(Q,K,V,'CausalMask',true);
+            test.verifyDlarrayEqual(default,masked)
+        end
+        
+        function canTurnOffMask(test)
+            % Verify the 'CausalMask' NVP can be false - no value should be
+            % "very small"
+            keyDim = 3;
+            valDim = 7;
+            numKeys = 4;
+            numQueries = 5;
+            batchSize = 6;
+            Q = dlarray(rand(keyDim,numQueries,batchSize));
+            K = dlarray(rand(keyDim,numKeys,batchSize));
+            V = dlarray(rand(valDim,numKeys,batchSize));
+            A = test.multiheadAttention(Q,K,V,'CausalMask',false);
+            import matlab.unittest.constraints.EveryElementOf
+            import matlab.unittest.constraints.IsGreaterThan
+            test.verifyThat(EveryElementOf(extractdata(A)),IsGreaterThan(-1e-9));
+        end
+        
+        function canDropout(test)
+            % By setting the value matrix V to the identity, the output of
+            % multiheadAttention with dropout is simply the output without
+            % dropout with dropout applied separately.
+            keyDim = 5;
+            numKeys = 3;
+            q = dlarray(rand(keyDim,1));
+            K = dlarray(rand(keyDim,numKeys));
+            V = dlarray(eye(numKeys));
+            attnNoDropout = test.multiheadAttention(q,K,V,'Dropout',0);
+            % Reset global seed between non-deterministic calls
+            p = 0.5;
+            rng(0);
+            attnWithDropout = test.multiheadAttention(q,K,V,'Dropout',p);
+            rng(0);
+            attnExp = transformer.layer.dropout(attnNoDropout,p);
+            test.verifyEqual(attnWithDropout,attnExp);
+        end
+        
+        function defaultIsNoDropout(test)
+            % Verify the default is no dropout applied to
+            % multiheadAttention
+            keyDim = 3;
+            valDim = 7;
+            numKeys = 4;
+            numQueries = 5;
+            batchSize = 6;
+            Q = dlarray(rand(keyDim,numQueries,batchSize));
+            K = dlarray(rand(keyDim,numKeys,batchSize));
+            V = dlarray(rand(valDim,numKeys,batchSize));
+            A_default = test.multiheadAttention(Q,K,V);
+            A_exp = test.multiheadAttention(Q,K,V,'Dropout',0);
+            test.verifyEqual(A_default,A_exp);
         end
         
         function multipleObservations(test)
@@ -167,5 +234,4 @@ classdef tmultiheadAttention < matlab.unittest.TestCase
             test.verifyEqual(extractdata(x),extractdata(y),varargin{:});
         end
     end
-    
 end

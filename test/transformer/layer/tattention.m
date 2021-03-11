@@ -123,6 +123,86 @@ classdef tattention < matlab.unittest.TestCase
             yExp = fullyconnect(z,params.attn_c_proj_w_0,params.attn_c_proj_b_0,'DataFormat','CBT');
             test.verifyEqual(extractdata(yAct),extractdata(yExp),'AbsTol',1e-5);
         end
+        
+        function defaultIsMaksed(test)
+            % Verify the default for the 'CausalMask' NVP is true
+            latentDim = 10;
+            hyperParams.NumHeads = 2;
+            past = [];
+            numQueries = 2;
+            % Set up the fc weights to be identity matrices and biases to
+            % be 0. 
+            weights = test.prepareWeightsStructWithIdentityFC(hyperParams.NumHeads,latentDim);
+            % Call attention on an arbitrary input.
+            x = dlarray(rand(latentDim*hyperParams.NumHeads*3,numQueries));
+            default = test.attention(x,past,weights,hyperParams);
+            masked = test.attention(x,past,weights,hyperParams,'CausalMask',true);
+            test.verifyEqual(extractdata(default),extractdata(masked));            
+        end
+        
+        function canTurnOffMask(test)
+            % Verify the 'CausalMask' NVP can be set to false - the expectation
+            % is this simply sets 'Masked' to false for the
+            % multiheadAttention call.
+            latentDim = 10;
+            hyperParams.NumHeads = 2;
+            past = [];
+            numQueries = 2;
+            % Set up the fc weights to be identity matrices and biases to
+            % be 0. 
+            weights = test.prepareWeightsStructWithIdentityFC(hyperParams.NumHeads,latentDim);
+            % Call attention on an arbitrary input.
+            x = dlarray(rand(latentDim*hyperParams.NumHeads*3,numQueries));
+            yAct = test.attention(x,past,weights,hyperParams,'CausalMask',false);
+            [Q,K,V] = iSplitQKV(x,hyperParams.NumHeads,latentDim);
+            % Verify against the multiheadAttention function with 'Masked'
+            % set to false.
+            yExp = test.multiheadAttention(Q,K,V,'CausalMask',false);
+            yExp = iMergeHeads(yExp);
+            test.verifyEqual(yAct,yExp);
+        end
+        
+        function canDropout(test)
+            % Verify dropout can be applied to attention - the expectation
+            % is that this matches simply setting the Dropout NVP in the
+            % multiheadAttention call
+            latentDim = 10;
+            hyperParams.NumHeads = 2;
+            past = [];
+            numQueries = 2;
+            % Set up the fc weights to be identity matrices and biases to
+            % be 0. 
+            weights = test.prepareWeightsStructWithIdentityFC(hyperParams.NumHeads,latentDim);
+            % Call attention on an arbitrary input.
+            x = dlarray(rand(latentDim*hyperParams.NumHeads*3,numQueries));
+            p = 0.5;
+            % Set global rng between non-deterministic calls.
+            rng(0);
+            yAct = test.attention(x,past,weights,hyperParams,'Dropout',p);
+            [Q,K,V] = iSplitQKV(x,hyperParams.NumHeads,latentDim);
+            % Verify against the multiheadAttention function with 'Dropout'
+            % set to p
+            % Set global rng between non-deterministic calls.
+            rng(0);
+            yExp = test.multiheadAttention(Q,K,V,'Dropout',p);
+            yExp = iMergeHeads(yExp);
+            test.verifyEqual(yAct,yExp);
+        end
+        
+        function defaultIsNoDropout(test)
+            % Verify the default Dropout is 0.
+            latentDim = 10;
+            hyperParams.NumHeads = 2;
+            numQueries = 2;
+            % Set up a fake past by making an initial call to attention.
+            past = [];
+            params = test.prepareWeightsStructUsingGenerators(hyperParams.NumHeads,latentDim,@randn,@randn);
+            % Call attention on an arbitrary input.
+            x = dlarray(rand(latentDim*hyperParams.NumHeads*3,numQueries));
+            yDefault = test.attention(x,past,params,hyperParams);
+            yNoDropout = test.attention(x,past,params,hyperParams,'Dropout',0);
+            test.verifyEqual(yDefault,yNoDropout);
+        end
     end
     
     methods(Access=private)

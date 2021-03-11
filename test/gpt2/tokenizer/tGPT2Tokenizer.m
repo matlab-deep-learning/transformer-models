@@ -82,7 +82,7 @@ classdef(SharedTestFixtures = {DownloadGPT2Fixture}) tGPT2Tokenizer < matlab.uni
         function commentNotInBPE(test)
             % The vocab.bpe includes a comment that we must manually strip
             % out. Ensure we do that.
-            vocabFile = fullfile(iModelPath(),iModelName(),'vocab.bpe');
+            vocabFile = gpt2.internal.getSupportFilePath("gpt2_vocab.bpe");
             fid = fopen(vocabFile,'r','n','utf-8');
             s = textscan(fid,'%s', 'Delimiter', '\n');
             fclose(fid);
