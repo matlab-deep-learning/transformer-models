@@ -51,7 +51,7 @@ function varargout = model(x,parameters,nvp)
 arguments
     x dlarray {mustBeNumericDlarray,mustBeNonempty}
     parameters {mustBeA(parameters,'struct')}
-    nvp.InputMask = logical.empty()
+    nvp.InputMask {mustBeNumericOrLogical} = logical.empty()
     nvp.DropoutProb (1,1) {mustBeNonnegative,mustBeLessThanOrEqual(nvp.DropoutProb,1),mustBeNumeric} = 0
     nvp.AttentionDropoutProb (1,1) {mustBeNonnegative,mustBeLessThanOrEqual(nvp.AttentionDropoutProb,1),mustBeNumeric} = 0
     nvp.Outputs {mustBePositive,mustBeLessThanOrEqualNumLayers(nvp.Outputs,parameters),mustBeInteger,mustBeNumeric} = parameters.Hyperparameters.NumLayers
@@ -72,7 +72,7 @@ if isempty(nvp.InputMask)
     inputMask = x~=nvp.PaddingCode;
 else
     assert(isequal(size(nvp.InputMask),size(x)),"bert:model:InvalidMaskSize","Expected InputMask to have same size as input X.");
-    inputMask = nvp.InputMask;
+    inputMask = logical(nvp.InputMask);
 end
 
 % Assuming CTB format of x.
