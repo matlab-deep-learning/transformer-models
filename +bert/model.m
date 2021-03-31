@@ -51,7 +51,7 @@ function varargout = model(x,parameters,nvp)
 arguments
     x dlarray {mustBeNumericDlarray,mustBeNonempty}
     parameters {mustBeA(parameters,'struct')}
-    nvp.InputMask {mustBeALogicalOrDlarrayLogical} = logical.empty()
+    nvp.InputMask = logical.empty()
     nvp.DropoutProb (1,1) {mustBeNonnegative,mustBeLessThanOrEqual(nvp.DropoutProb,1),mustBeNumeric} = 0
     nvp.AttentionDropoutProb (1,1) {mustBeNonnegative,mustBeLessThanOrEqual(nvp.AttentionDropoutProb,1),mustBeNumeric} = 0
     nvp.Outputs {mustBePositive,mustBeLessThanOrEqualNumLayers(nvp.Outputs,parameters),mustBeInteger,mustBeNumeric} = parameters.Hyperparameters.NumLayers
