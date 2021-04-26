@@ -28,7 +28,7 @@ function [A, present] = attention(X, past, weights, hyperParameters, nvp)
 %                         hyper-parameter.
 %
 %   Outputs:
-%       Z               - A (numFeatures*numHeads)-by-numInputSubwords-by-numObs
+%       A               - A (numFeatures*numHeads)-by-numInputSubwords-by-numObs
 %                         output array.
 %       present         - A numFeatures-by-numAllSubwords-by-numHeads-by-numObs-by-2
 %                         array. This contains the 'keys' and 'values' that
