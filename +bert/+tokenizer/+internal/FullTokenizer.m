@@ -85,9 +85,10 @@ classdef FullTokenizer < bert.tokenizer.internal.Tokenizer
             %   tokens = tokenize(tokenizer,text) tokenizes the input
             %   string text using the FullTokenizer specified by tokenizer.
             basicToks = this.Basic.tokenize(txt);
+            basicToksUnicode = textanalytics.unicode.UTF32(basicToks);
             subToks = cell(numel(basicToks),1);
             for i = 1:numel(basicToks)
-                subToks{i} = this.WordPiece.tokenize(basicToks{i});
+                subToks{i} = this.WordPiece.tokenize(basicToksUnicode(i));
             end
             toks = cat(2,subToks{:});
         end
