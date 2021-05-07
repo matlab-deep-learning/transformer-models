@@ -34,12 +34,11 @@ classdef BasicTokenizer < bert.tokenizer.internal.Tokenizer
             u = this.cleanText(u);
             u = this.tokenizeCJK(u);
             text = u.string();
-            origTokens = this.whiteSpaceTokenize(text);
             if this.IgnoreCase
-                origTokens = lower(origTokens);
-                origTokens = textanalytics.unicode.nfd(origTokens);
+                text = lower(text);
+                text = textanalytics.unicode.nfd(text);
             end
-            u = textanalytics.unicode.UTF32(origTokens);
+            u = textanalytics.unicode.UTF32(text);
             cats = u.characterCategories('Granularity','detailed');
             if this.IgnoreCase
                 [u,cats] = this.stripAccents(u,cats);

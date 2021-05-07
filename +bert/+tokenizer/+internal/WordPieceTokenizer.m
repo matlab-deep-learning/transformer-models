@@ -63,8 +63,9 @@ classdef WordPieceTokenizer < bert.tokenizer.internal.Tokenizer
                         if start>1
                             sub.Data = [uint32('##'),sub.Data];
                         end
-                        if this.Vocab.isVocabularyWord(sub.string())
-                            currentSub = sub.string();
+                        strForm = sub.string();
+                        if this.Vocab.isVocabularyWord(strForm)
+                            currentSub = strForm;
                             break
                         end
                         finish = finish-1;
