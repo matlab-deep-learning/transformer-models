@@ -35,9 +35,6 @@ classdef WordPieceTokenizer < bert.tokenizer.internal.Tokenizer
             this.Unk = nvp.UnknownToken;
             this.MaxChar = nvp.MaxTokenLength;
             this.Vocab = this.parseVocab(vocab);
-            
-            
-            
         end
         
         function tokens = tokenize(this,text)
