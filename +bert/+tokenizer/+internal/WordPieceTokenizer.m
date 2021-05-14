@@ -35,6 +35,9 @@ classdef WordPieceTokenizer < bert.tokenizer.internal.Tokenizer
             this.Unk = nvp.UnknownToken;
             this.MaxChar = nvp.MaxTokenLength;
             this.Vocab = this.parseVocab(vocab);
+            
+            
+            
         end
         
         function tokens = tokenize(this,text)
@@ -98,7 +101,7 @@ classdef WordPieceTokenizer < bert.tokenizer.internal.Tokenizer
             c = fread(fid,Inf);
             fclose(fid);
             c = native2unicode(c,'utf-8');%#ok
-            words = split(splitlines(c')).';
+            words = splitlines(c').';
             empties = cellfun(@isempty,words);
             words(empties) = [];
             vocab = wordEncoding(words);
