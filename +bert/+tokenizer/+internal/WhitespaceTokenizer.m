@@ -10,7 +10,7 @@ classdef WhitespaceTokenizer < bert.tokenizer.internal.Tokenizer
             %                              by splitting str on whitespace.
             arguments
                 ~
-                text (1,1) string
+                text
             end
             text = strip(text);
             text = split(text).';

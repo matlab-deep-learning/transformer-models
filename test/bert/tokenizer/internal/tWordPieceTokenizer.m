@@ -39,7 +39,8 @@ classdef(SharedTestFixtures = {
             tok = bert.tokenizer.internal.WordPieceTokenizer(enc,'UnknownToken',unk);
             test.verifyEqual(tok.Unk,unk)
             str = "blah";
-            act_out = tok.tokenize(str);
+            ustr = textanalytics.unicode.UTF32(str);
+            act_out = tok.tokenize(ustr);
             exp_out = unk;
             test.verifyEqual(act_out,exp_out);
         end
@@ -50,7 +51,8 @@ classdef(SharedTestFixtures = {
             tok = bert.tokenizer.internal.WordPieceTokenizer(enc,'MaxTokenLength',maxLen);
             test.verifyEqual(tok.MaxChar,maxLen);
             str = "foo";
-            act_out = tok.tokenize(str);
+            ustr = textanalytics.unicode.UTF32(str);
+            act_out = tok.tokenize(ustr);
             exp_out = tok.Unk;
             test.verifyEqual(act_out,exp_out);
         end
@@ -59,7 +61,9 @@ classdef(SharedTestFixtures = {
             enc = wordEncoding(["foo","bar","##foo"]);
             tok = bert.tokenizer.internal.WordPieceTokenizer(enc);
             str = "foo bar foobar barba bafoobar barfoo";
-            act_out = tok.tokenize(str);
+            wsTok = bert.tokenizer.internal.WhitespaceTokenizer;
+            ustr = textanalytics.unicode.UTF32(wsTok.tokenize(str));
+            act_out = tok.tokenize(ustr);
             exp_out = ["foo","bar",tok.Unk,tok.Unk,tok.Unk,"bar","##foo"];
             test.verifyEqual(act_out,exp_out);
         end

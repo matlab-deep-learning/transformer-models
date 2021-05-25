@@ -37,16 +37,15 @@ classdef WordPieceTokenizer < bert.tokenizer.internal.Tokenizer
             this.Vocab = this.parseVocab(vocab);
         end
         
-        function tokens = tokenize(this,text)
+        function tokens = tokenize(this,utext)
             arguments
                 this
-                text (1,1) string
+                utext
             end
             tokens = string.empty();
-            wsTokens = this.WhitespaceTokenizer.tokenize(text);
-            wsTokensU = textanalytics.unicode.UTF32(wsTokens);
-            for i = 1:numel(wsTokensU)
-                token = wsTokensU(i);
+            sub = textanalytics.unicode.UTF32();
+            for i = 1:numel(utext)
+                token = utext(i);
                 if numel(token.Data)>this.MaxChar
                     tokens = [tokens,this.Unk]; %#ok
                     continue
@@ -57,14 +56,14 @@ classdef WordPieceTokenizer < bert.tokenizer.internal.Tokenizer
                 while start<(numel(token.Data)+1)
                     finish = numel(token.Data);
                     currentSub = [];
-                    while start<finish+1
-                        sub = textanalytics.unicode.UTF32();
+                    while start<finish+1                        
                         sub.Data = token.Data(start:finish);
                         if start>1
                             sub.Data = [uint32('##'),sub.Data];
                         end
-                        if this.Vocab.isVocabularyWord(sub.string())
-                            currentSub = sub.string();
+                        strForm = sub.string();
+                        if this.Vocab.isVocabularyWord(strForm)
+                            currentSub = strForm;
                             break
                         end
                         finish = finish-1;
