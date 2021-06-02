@@ -15,8 +15,6 @@ This repository implements deep learning transformer models in MATLAB.
 ## Getting Started
 Download or [clone](https://www.mathworks.com/help/matlab/matlab_prog/use-source-control-with-projects.html#mw_4cc18625-9e78-4586-9cc4-66e191ae1c2c) this repository to your machine and open it in MATLAB. 
 
-For R2020a or R2020b download the repo at the corresponding tagged release, or if you are using `git` then `git checkout <release>` where `<release>` is `R2020a` or `R2020b`.
-
 ## Functions
 ### bert
 `mdl = bert` loads a pretrained BERT transformer model and if necessary, downloads the model weights. The output `mdl` is structure with fields `Tokenizer` and `Parameters` that contain the BERT tokenizer and the model parameters, respectively.
