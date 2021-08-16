@@ -125,6 +125,17 @@ classdef(SharedTestFixtures = {
             test.verifyError(@() tok.encode(x1,x2), 'bert:tokenizer:SentencePairNumelMismatch');
         end
         
+        function canReturnWordStartingIndices(test)
+            % The tokenizer splits baz and adds markers;
+            % the other tokens are "original."
+            x = "foo, bar. Baz!";
+            tok = test.Constructor();
+            [~,tokIdx] = tok.encode(x);
+            %              [CLS]  foo    ,  bar    .   ba   ##z    ! [SEP]
+            exp_tokIdx = {[false true true true true true false true false]};
+            test.verifyEqual(tokIdx, exp_tokIdx);
+        end
+
         function canDecode(test)
             % Verify the decode method is "nearly" an inverse of encode -
             % it leaves the special tokens in and assumes space separation.

@@ -79,11 +79,18 @@ classdef FullTokenizer < bert.tokenizer.internal.Tokenizer
             this.Encoding = this.WordPiece.Vocab;
         end
         
-        function toks = tokenize(this,txt)
+        function [toks, normalWords] = tokenize(this,txt)
             % tokenize   Tokenizes text.
             % 
             %   tokens = tokenize(tokenizer,text) tokenizes the input
             %   string text using the FullTokenizer specified by tokenizer.
+            %
+            %   [tokens,normalWords] = tokenize(__) additionally returns a
+            %   cell-array where normalWords{i} is a logical of the same
+            %   length as tokens{i} and normalWords{i}(j) is true if and only
+            %   if tokens{j}(i) starts at a natural token; it is false for
+            %   subword tokens (starting in the middle of a word) and
+            %   separator tokens.
             basicToks = this.Basic.tokenize(txt);
             basicToksUnicode = textanalytics.unicode.UTF32(basicToks);
             subToks = cell(numel(basicToks),1);
@@ -91,6 +98,9 @@ classdef FullTokenizer < bert.tokenizer.internal.Tokenizer
                 subToks{i} = this.WordPiece.tokenize(basicToksUnicode(i));
             end
             toks = cat(2,subToks{:});
+            normalWords = false(size(toks));
+            subToksLengths = cellfun(@numel, subToks);
+            normalWords(cumsum([1;subToksLengths(1:end-1)])) = true;
         end
         
         function idx = encode(this,tokens)

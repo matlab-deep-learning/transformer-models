@@ -99,7 +99,7 @@ classdef BERTTokenizer
             this.MaskCode = this.FullTokenizer.encode(this.MaskToken);
         end
         
-        function tokens = tokenize(this,text_a,text_b)
+        function [tokens,normalWords] = tokenize(this,text_a,text_b)
             % tokenize   Tokenizes a batch of strings and adds special
             % tokens for the BERT model.
             %
@@ -117,6 +117,13 @@ classdef BERTTokenizer
             %   between the tokenized text_a(i) and text_b(i). The inputs
             %   text_a and text_b must have the same number of elements.
             %
+            %   [tokens,normalWords] = tokenize(__) additionally returns a
+            %   cell-array where normalWords{i} is a logical of the same
+            %   length as tokens{i} and normalWords{i}(j) is true if and only
+            %   if tokens{j}(i) starts at a natural token; it is false for
+            %   subword tokens (starting in the middle of a word) and
+            %   separator tokens.
+            %
             % Example:
             %   tokenizer = bert.tokenizer.BERTTokenizer;
             %   tokens = tokenizer.tokenize("Hello world!")
@@ -132,13 +139,16 @@ classdef BERTTokenizer
             text_a = reshape(text_a,[],1);
             text_b = reshape(text_b,[],1);
             tokenize = @(text) this.FullTokenizer.tokenize(text);
-            tokens = arrayfun(tokenize,text_a,'UniformOutput',false);
+            [tokens,normalWords] = arrayfun(tokenize,text_a,'UniformOutput',false);
             if ~isempty(text_b)
-                tokens_b = arrayfun(tokenize,text_b,'UniformOutput',false);
+                [tokens_b,normalWords_b] = arrayfun(tokenize,text_b,'UniformOutput',false);
                 tokens = cellfun(@(tokens_a,tokens_b) [tokens_a,this.SeparatorToken,tokens_b], tokens, tokens_b, 'UniformOutput', false);
+                normalWords = cellfun(@(tf_a, tf_b) [tf_a,false,tf_b], normalWords, normalWords_b, 'UniformOutput', false);
             end
             tokens = cellfun(@(tokens) [this.StartToken, tokens, this.SeparatorToken], tokens, 'UniformOutput', false);
+            normalWords = cellfun(@(tf) [false, tf, false], normalWords, 'UniformOutput', false);
             tokens = reshape(tokens,inputShape);
+            normalWords = reshape(normalWords,inputShape);
         end
         
         function x = encodeTokens(this,toks)
@@ -158,7 +168,7 @@ classdef BERTTokenizer
             x = cellfun(@(tokens) this.FullTokenizer.encode(tokens), toks, 'UniformOutput', false);
         end
         
-        function x = encode(this,text_a,text_b)
+        function [x,normalWords] = encode(this,text_a,text_b)
             % encode   Tokenizes and encodes strings.
             %
             %   x = encode(bertTokenizer,text) will tokenize
@@ -173,6 +183,13 @@ classdef BERTTokenizer
             %   The inputs text_a and text_b must have the same number of
             %   elements.
             %
+            %   [x,normalWords] = encode(__) additionally returns a
+            %   cell-array where normalWords{i} is a logical of the same
+            %   length as x{i} and normalWords{i}(j) is true if and only
+            %   if x{j}(i) starts at a natural token; it is false for
+            %   subword tokens (starting in the middle of a word) and
+            %   separator tokens.
+            %
             % Example:
             %   tokenizer = bert.tokenizer.BERTTokenizer;
             %   sequences = tokenizer.encode(["Hello world!"; ...
@@ -185,7 +202,7 @@ classdef BERTTokenizer
             if ~isempty(text_b) && numel(text_a)~=numel(text_b)
                 error("bert:tokenizer:SentencePairNumelMismatch","For sentence-pairs, both inputs must have the same number of elements");
             end
-            tokens = this.tokenize(text_a,text_b);
+            [tokens,normalWords] = this.tokenize(text_a,text_b);
             x = this.encodeTokens(tokens);
         end
         
