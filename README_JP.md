@@ -1,7 +1,7 @@
 # MATLABのためのトランスフォーマーモデル
 [![CircleCI](https://img.shields.io/circleci/build/github/matlab-deep-learning/transformer-models?label=tests)](https://app.circleci.com/pipelines/github/matlab-deep-learning/transformer-models)
 
-*README in English is [here](https://github.com/matlab-deep-learning/transformer-models/blob/master/README.md)
+* README in English is [here](./README.md).
 
 このリポジトリは、MATLABで深層学習トランスフォーマーモデルを実装するための関数や例題が含まれています。なお、BERT、finBERT、GPT-2は、基本的には、BERTの"multilingual-cased"を除き英語の文書を用いて学習されており、入力値も英語であることが想定されています。
 
