@@ -3,6 +3,8 @@
 
 This repository implements deep learning transformer models in MATLAB.
 
+日本語のREADMEは[こちら](https://github.com/matlab-deep-learning/transformer-models/blob/master/README_JP.md)
+
 ## Requirements
 ### BERT and FinBERT
 - MATLAB R2021a or later
