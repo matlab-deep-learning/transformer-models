@@ -1,5 +1,5 @@
 classdef(SharedTestFixtures = {
-        DownloadBERTFixture}) tbert < matlab.unittest.TestCase
+        DownloadBERTFixture, DownloadJPBERTFixture}) tbert < matlab.unittest.TestCase
     % tbert   System level tests for bert
     
     % Copyright 2021 The MathWorks, Inc.
@@ -7,12 +7,21 @@ classdef(SharedTestFixtures = {
     properties(TestParameter)
         UncasedVersion = {"base", ...
                    "tiny"}
+        AllModels = {"base","multilingual-cased","medium",...
+            "small","mini","tiny","japanese-base",...
+            "japanese-base-wwm"}
     end
     
     methods(Test)
+        
         function canConstructModelWithDefault(test)
             % Verify the default model can be constructed.
             test.verifyWarningFree(@() bert());
+        end
+
+        function canConstructAllModels(test, AllModels)
+            % Verify the all available models can be constructed.
+            test.verifyWarningFree(@() bert('Model', AllModels));
         end
            
         function canConstructModelWithNVPAndVerifyDefault(test)

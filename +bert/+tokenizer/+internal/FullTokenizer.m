@@ -93,7 +93,7 @@ classdef FullTokenizer < bert.tokenizer.internal.Tokenizer
                 % Default case
                 this.Basic = bert.tokenizer.internal.BasicTokenizer('IgnoreCase',nvp.IgnoreCase);
             else
-                assert(isa(nvp.BasicTokenizer,'bert.tokenizer.internal.Tokenizer'),"BasicTokenizer must be a bert.tokenizer.internal.Tokenizer implementation.");
+                mustBeA(nvp.BasicTokenizer,'bert.tokenizer.internal.Tokenizer');
                 this.Basic = nvp.BasicTokenizer;
             end
             this.WordPiece = bert.tokenizer.internal.WordPieceTokenizer(vocab);
@@ -106,10 +106,9 @@ classdef FullTokenizer < bert.tokenizer.internal.Tokenizer
             %   tokens = tokenize(tokenizer,text) tokenizes the input
             %   string text using the FullTokenizer specified by tokenizer.
             basicToks = this.Basic.tokenize(txt);
-            basicToksUnicode = cellfun(@textanalytics.unicode.UTF32,basicToks,UniformOutput=false);
             toks = cell(numel(txt),1);
             for i = 1:numel(txt)
-                theseBasicToks = basicToksUnicode{i};
+                theseBasicToks = textanalytics.unicode.UTF32(basicToks{i});
                 theseSubToks = cell(numel(theseBasicToks),1);
                 for j = 1:numel(theseBasicToks)
                     theseSubToks{j} = this.WordPiece.tokenize(theseBasicToks(j));

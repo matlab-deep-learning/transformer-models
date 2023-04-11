@@ -110,7 +110,7 @@ classdef BERTTokenizer
                 ignoreCase = nvp.IgnoreCase;
                 this.FullTokenizer = bert.tokenizer.internal.FullTokenizer(vocabFile,'IgnoreCase',ignoreCase);
             else
-                assert(isa(nvp.FullTokenizer,'bert.tokenizer.internal.FullTokenizer'),"FullTokenizer must be a bert.tokenizer.internal.FullTokenizer.");
+                mustBeA(nvp.FullTokenizer,'bert.tokenizer.internal.FullTokenizer');
                 this.FullTokenizer = nvp.FullTokenizer;
             end
             this.PaddingCode = this.FullTokenizer.encode(this.PaddingToken);

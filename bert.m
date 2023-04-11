@@ -23,45 +23,9 @@ end
 
 switch nvp.Model
     case "japanese-base"
-        zipFilePath = bert.internal.getSupportFilePath("japanese-base", "bert-base-japanese.zip");
-        modelDir = fullfile(fileparts(zipFilePath), "bert-base-japanese");      
-        unzip(zipFilePath, modelDir);
-        % Build the tokenizer
-        btok = bert.tokenizer.internal.TokenizedDocumentTokenizer("Language","ja","TokenizeMethod","mecab",IgnoreCase=false);
-        vocabFile = fullfile(modelDir, "vocab.txt");
-        ftok = bert.tokenizer.internal.FullTokenizer(vocabFile,BasicTokenizer=btok);
-        tok = bert.tokenizer.BERTTokenizer(vocabFile,FullTokenizer=ftok);
-        % Build the model
-        params.Weights = load(fullfile(modelDir, "weights.mat"));
-        params.Weights = dlupdate(@dlarray,params.Weights);
-        params.Hyperparameters = struct(...
-            NumHeads=12,...
-            NumLayers=12,...
-            NumContext=512,...
-            HiddenSize=768);
-        mdl = struct(...
-            Tokenizer=tok,...
-            Parameters=params);
+        mdl = iJapaneseBERTModel("japanese-base", "bert-base-japanese.zip");
     case "japanese-base-wwm"
-        zipFilePath = bert.internal.getSupportFilePath("japanese-base", "bert-base-japanese-whole-word-masking.zip");
-        modelDir = fullfile(fileparts(zipFilePath), "bert-base-japanese-whole-word-masking");      
-        unzip(zipFilePath, modelDir);
-        % Build the tokenizer
-        btok = bert.tokenizer.internal.TokenizedDocumentTokenizer("Language","ja","TokenizeMethod","mecab",IgnoreCase=false);
-        vocabFile = fullfile(modelDir, "vocab.txt");
-        ftok = bert.tokenizer.internal.FullTokenizer(vocabFile,BasicTokenizer=btok);
-        tok = bert.tokenizer.BERTTokenizer(vocabFile,FullTokenizer=ftok);
-        % Build the model
-        params.Weights = load(fullfile(modelDir, "weights.mat"));
-        params.Weights = dlupdate(@dlarray,params.Weights);
-        params.Hyperparameters = struct(...
-            NumHeads=12,...
-            NumLayers=12,...
-            NumContext=512,...
-            HiddenSize=768);
-        mdl = struct(...
-            Tokenizer=tok,...
-            Parameters=params);
+        mdl = iJapaneseBERTModel("japanese-base-wwm", "bert-base-japanese-whole-word-masking.zip");
     otherwise
         % Download the license file
         bert.internal.getSupportFilePath(nvp.Model,"bert.RIGHTS");
@@ -76,4 +40,26 @@ switch nvp.Model
             'Tokenizer',bert.tokenizer.BERTTokenizer(vocabFile,'IgnoreCase',ignoreCase),...
             'Parameters',params);
 end
+end
+
+function mdl = iJapaneseBERTModel(modelName, zipFileName)
+zipFilePath = bert.internal.getSupportFilePath(modelName, zipFileName);
+modelDir = fullfile(fileparts(zipFilePath), replace(zipFileName, ".zip", ""));      
+unzip(zipFilePath, modelDir);
+% Build the tokenizer
+btok = bert.tokenizer.internal.TokenizedDocumentTokenizer("Language","ja","TokenizeMethod","mecab",IgnoreCase=false);
+vocabFile = fullfile(modelDir, "vocab.txt");
+ftok = bert.tokenizer.internal.FullTokenizer(vocabFile,BasicTokenizer=btok);
+tok = bert.tokenizer.BERTTokenizer(vocabFile,FullTokenizer=ftok);
+% Build the model
+params.Weights = load(fullfile(modelDir, "weights.mat"));
+params.Weights = dlupdate(@dlarray,params.Weights);
+params.Hyperparameters = struct(...
+    NumHeads=12,...
+    NumLayers=12,...
+    NumContext=512,...
+    HiddenSize=768);
+mdl = struct(...
+    Tokenizer=tok,...
+    Parameters=params);
 end

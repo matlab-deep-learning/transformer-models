@@ -135,6 +135,7 @@ mbqTrain = minibatchqueue(cdsTrain,2,...
 
 %%
 % Initialize training progress plot.
+% In 23a you can use trainingProgressMonitor
 figure
 C = colororder;
 lineLossTrain = animatedline("Color",C(2,:));

@@ -17,6 +17,15 @@ classdef tBasicTokenizer < matlab.unittest.TestCase
             act_out = tok.tokenize(str);
             test.verifyEqual(act_out,exp_out);           
         end
+
+        function canTokenizeBatch(test)
+            tok = bert.tokenizer.internal.BasicTokenizer();
+            manyStrs = repmat("foo bar baz",1,20);
+            act_out = tokenize(tok, manyStrs);
+            exp_out = arrayfun(@(str) tokenize(tok,str),manyStrs,UniformOutput=false);
+            exp_out = [exp_out{:}];
+            test.verifyEqual(act_out,exp_out);           
+        end
         
         function removesControlCharactersAndWhitespace(test)
             tok = bert.tokenizer.internal.BasicTokenizer();
