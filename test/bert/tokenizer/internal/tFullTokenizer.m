@@ -20,7 +20,7 @@ classdef(SharedTestFixtures = {
         function errorsIfBasicTokenizerIsNotTokenizer(test)
             vocabFile = bert.internal.getSupportFilePath("base","vocab.txt");
             makeTok = @() bert.tokenizer.internal.FullTokenizer(vocabFile,Basic=vocabFile);
-            test.verifyError(makeTok,"");
+            test.verifyError(makeTok,"MATLAB:validators:mustBeA");
         end
 
         function canSetBasicTokenizer(test)
