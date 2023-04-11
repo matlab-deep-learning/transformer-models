@@ -29,6 +29,8 @@ Download or [clone](https://www.mathworks.com/help/matlab/matlab_prog/use-source
 - `"small"` - A 4 layer model with hidden size 512.
 - `"mini"` - A 4 layer model with hidden size 256.
 - `"tiny"` - A 2 layer model with hidden size 128.
+- `"japanese-base"` - A 12 layer model with hidden size 768, pretrained on texts in the Japanese language.
+- `"japanese-base-wwm"` - A 12 layer model with hidden size 768, pretrained on texts in the Japanese language. Additionally, the model is trained with the whole word masking enabled for the masked language modeling (MLM) objective.
 
 ### bert.model
 `Z = bert.model(X,parameters)` performs inference with a BERT model on the input `1`-by-`numInputTokens`-by-`numObservations` array of encoded tokens with the specified parameters. The output `Z` is an array of size (`NumHeads*HeadSize`)-by-`numInputTokens`-by-`numObservations`. The element `Z(:,i,j)` corresponds to the BERT embedding of input token `X(1,i,j)`.

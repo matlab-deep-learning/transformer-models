@@ -1,7 +1,7 @@
 classdef BasicTokenizer < bert.tokenizer.internal.Tokenizer
     % BasicTokenizer   Perform basic tokenization.
     
-    % Copyright 2020 The MathWorks, Inc.
+    % Copyright 2020-2023 The MathWorks, Inc.
     
     properties(SetAccess=private)
         IgnoreCase
@@ -28,24 +28,29 @@ classdef BasicTokenizer < bert.tokenizer.internal.Tokenizer
         function tokens = tokenize(this,text)
             arguments
                 this (1,1) bert.tokenizer.internal.BasicTokenizer
-                text (1,1) string
+                text (1,:) string
             end
-            u = textanalytics.unicode.UTF32(text);
-            u = this.cleanText(u);
-            u = this.tokenizeCJK(u);
-            text = u.string();
-            if this.IgnoreCase
-                text = lower(text);
-                text = textanalytics.unicode.nfd(text);
+            tokens = cell(1,numel(string));
+            for i = 1:numel(text)
+                thisText = text(i);
+                u = textanalytics.unicode.UTF32(thisText);
+                u = this.cleanText(u);
+                u = this.tokenizeCJK(u);
+                thisText = u.string();
+                if this.IgnoreCase
+                    thisText = lower(thisText);
+                    thisText = textanalytics.unicode.nfd(thisText);
+                end
+                u = textanalytics.unicode.UTF32(thisText);
+                cats = u.characterCategories('Granularity','detailed');
+                if this.IgnoreCase
+                    [u,cats] = this.stripAccents(u,cats);
+                end
+                theseTokens = this.splitOnPunc(u,cats);
+                theseTokens = join(cat(2,theseTokens{:})," ");
+                theseTokens = this.whiteSpaceTokenize(theseTokens);
+                tokens{i} = theseTokens;
             end
-            u = textanalytics.unicode.UTF32(text);
-            cats = u.characterCategories('Granularity','detailed');
-            if this.IgnoreCase
-                [u,cats] = this.stripAccents(u,cats);
-            end
-            tokens = this.splitOnPunc(u,cats);
-            tokens = join(cat(2,tokens{:})," ");
-            tokens = this.whiteSpaceTokenize(tokens);
         end
     end
     

@@ -9,9 +9,16 @@ classdef BERTTokenizer
     %   case-insensitive BERTTokenizer using the file vocabFile as
     %   the vocabulary.
     %
-    %   tokenizer = BERTTokenizer(vocabFile,'IgnoreCase',tf)
-    %   Constructs a BERTTokenizer which is case-sensitive or not
-    %   according to the scalar logical tf. The default is true.
+    %   tokenizer = BERTTokenizer(vocabFile,'PARAM1', VAL1, 'PARAM2', VAL2, ...) 
+    %   specifies the optional parameter name/value pairs:
+    %
+    %   'IgnoreCase'           - A logical value to control if the
+    %                            BERTTokenizer is case sensitive or not.
+    %                            The default value is true.
+    %
+    %   'FullTokenizer'        - The underlying word-piece tokenizer.
+    %                            If not specified, a default
+    %                            FullTokenizer is constructed.
     %
     %   BERTTokenizer properties:
     %     FullTokenizer  - The underlying word-piece tokenizer.
@@ -34,7 +41,7 @@ classdef BERTTokenizer
     %   tokenizer = bert.tokenizer.BERTTokenizer();
     %   sequences = tokenizer.encode("Hello World!")
     
-    % Copyright 2021 The MathWorks, Inc.
+    % Copyright 2021-2023 The MathWorks, Inc.
     
     properties(Constant)
         PaddingToken = "[PAD]"
@@ -63,9 +70,16 @@ classdef BERTTokenizer
             %   case-insensitive BERTTokenizer using the file vocabFile as
             %   the vocabulary.
             %
-            %   tokenizer = BERTTokenizer(vocabFile,'IgnoreCase',tf)
-            %   Constructs a BERTTokenizer which is case-sensitive or not
-            %   according to the scalar logical tf. The default is true.
+            %   tokenizer = BERTTokenizer(vocabFile,'PARAM1', VAL1, 'PARAM2', VAL2, ...) 
+            %   specifies the optional parameter name/value pairs:
+            %
+            %   'IgnoreCase'           - A logical value to control if the
+            %                            BERTTokenizer is case sensitive or not.
+            %                            The default value is true.
+            %
+            %   'FullTokenizer'        - The underlying word-piece tokenizer.
+            %                            If not specified, a default
+            %                            FullTokenizer is constructed.
             %
             %   BERTTokenizer properties:
             %     FullTokenizer  - The underlying word-piece tokenizer.
@@ -90,9 +104,15 @@ classdef BERTTokenizer
             arguments
                 vocabFile (1,1) string {mustBeFile} = bert.internal.getSupportFilePath("base","vocab.txt")
                 nvp.IgnoreCase (1,1) logical = true
+                nvp.FullTokenizer = []
             end
-            ignoreCase = nvp.IgnoreCase;
-            this.FullTokenizer = bert.tokenizer.internal.FullTokenizer(vocabFile,'IgnoreCase',ignoreCase);
+            if isempty(nvp.FullTokenizer)
+                ignoreCase = nvp.IgnoreCase;
+                this.FullTokenizer = bert.tokenizer.internal.FullTokenizer(vocabFile,'IgnoreCase',ignoreCase);
+            else
+                mustBeA(nvp.FullTokenizer,'bert.tokenizer.internal.FullTokenizer');
+                this.FullTokenizer = nvp.FullTokenizer;
+            end
             this.PaddingCode = this.FullTokenizer.encode(this.PaddingToken);
             this.SeparatorCode = this.FullTokenizer.encode(this.SeparatorToken);
             this.StartCode = this.FullTokenizer.encode(this.StartToken);
@@ -131,10 +151,9 @@ classdef BERTTokenizer
             inputShape = size(text_a);
             text_a = reshape(text_a,[],1);
             text_b = reshape(text_b,[],1);
-            tokenize = @(text) this.FullTokenizer.tokenize(text);
-            tokens = arrayfun(tokenize,text_a,'UniformOutput',false);
+            tokens = this.FullTokenizer.tokenize(text_a);
             if ~isempty(text_b)
-                tokens_b = arrayfun(tokenize,text_b,'UniformOutput',false);
+                tokens_b = this.FullTokenizer.tokenize(text_b);
                 tokens = cellfun(@(tokens_a,tokens_b) [tokens_a,this.SeparatorToken,tokens_b], tokens, tokens_b, 'UniformOutput', false);
             end
             tokens = cellfun(@(tokens) [this.StartToken, tokens, this.SeparatorToken], tokens, 'UniformOutput', false);
