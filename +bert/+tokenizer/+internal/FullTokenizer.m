@@ -1,41 +1,41 @@
 classdef FullTokenizer < bert.tokenizer.internal.Tokenizer
-   % FullTokenizer   A tokenizer based on word-piece tokenization.
-   %
-   %   tokenizer = FullTokenizer(vocabFile) constructs a FullTokenizer
-   %   using the vocabulary specified in the newline delimited txt file
-   %   vocabFile.
-   %
-   %   tokenizer = FullTokenizer(vocabFile,'PARAM1', VAL1, 'PARAM2', VAL2, ...)
-   %   specifies the optional parameter name/value pairs:
-   %
-   %   'BasicTokenizer'       - Tokenizer used to split text into words.
-   %                            If not specified, a default
-   %                            BasicTokenizer is constructed.
-   %
-   %   'IgnoreCase'           - A logical value to control if the
-   %                            FullTokenizer is case sensitive or not.
-   %                            The default value is true.
-   %
-   %   FullTokenizer methods:
-   %     tokenize - tokenize text
-   %     encode   - encode tokens
-   %     decode   - decode encoded tokens
-   %
-   % Example:
-   %   % Save a file named fakeVocab.txt with the text on the next 3 lines:
-   %   fake
-   %   vo
-   %   ##cab
-   %
-   %   % Now create a FullTokenizer
-   %   tokenizer = bert.tokenizer.internal.FullTokenizer('fakeVocab.txt');
-   %   tokens = tokenizer.tokenize("This tokenizer has a fake vocab")
-   %   % Note that most tokens are unknown as they are not in the
-   %   % vocabulary and neither are any sub-tokens. However "fake" is
-   %   % detected and "vocab" is split into "vo" and "##cab".
-   %   tokenizer.encode(tokens)
-   %   % This returns the encoded form of the tokens - each token is
-   %   % replaced by its corresponding line number in the fakeVocab.txt
+    % FullTokenizer   A tokenizer based on word-piece tokenization.
+    %
+    %   tokenizer = FullTokenizer(vocabFile) constructs a FullTokenizer
+    %   using the vocabulary specified in the newline delimited txt file
+    %   vocabFile.
+    %
+    %   tokenizer = FullTokenizer(vocabFile,'PARAM1', VAL1, 'PARAM2', VAL2, ...)
+    %   specifies the optional parameter name/value pairs:
+    %
+    %   'BasicTokenizer'       - Tokenizer used to split text into words.
+    %                            If not specified, a default
+    %                            BasicTokenizer is constructed.
+    %
+    %   'IgnoreCase'           - A logical value to control if the
+    %                            FullTokenizer is case sensitive or not.
+    %                            The default value is true.
+    %
+    %   FullTokenizer methods:
+    %     tokenize - tokenize text
+    %     encode   - encode tokens
+    %     decode   - decode encoded tokens
+    %
+    % Example:
+    %   % Save a file named fakeVocab.txt with the text on the next 3 lines:
+    %   fake
+    %   vo
+    %   ##cab
+    %
+    %   % Now create a FullTokenizer
+    %   tokenizer = bert.tokenizer.internal.FullTokenizer('fakeVocab.txt');
+    %   tokens = tokenizer.tokenize("This tokenizer has a fake vocab")
+    %   % Note that most tokens are unknown as they are not in the
+    %   % vocabulary and neither are any sub-tokens. However "fake" is
+    %   % detected and "vocab" is split into "vo" and "##cab".
+    %   tokenizer.encode(tokens)
+    %   % This returns the encoded form of the tokens - each token is
+    %   % replaced by its corresponding line number in the fakeVocab.txt
     
     % Copyright 2021-2023 The MathWorks, Inc.
     

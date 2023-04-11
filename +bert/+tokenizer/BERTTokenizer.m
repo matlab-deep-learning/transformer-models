@@ -1,45 +1,45 @@
 classdef BERTTokenizer
-   % BERTTokenizer   Construct a tokenizer to use with BERT
-   % models.
-   %
-   %   tokenizer = BERTTokenizer()   Constructs a case-insensitive
-   %   BERTTokenizer using the BERT-Base vocabulary file.
-   %
-   %   tokenizer = BERTTokenizer(vocabFile)   Constructs a
-   %   case-insensitive BERTTokenizer using the file vocabFile as
-   %   the vocabulary.
-   %
-   %   tokenizer = BERTTokenizer(vocabFile,'PARAM1', VAL1, 'PARAM2', VAL2, ...) 
-   %   specifies the optional parameter name/value pairs:
-   %
-   %   'IgnoreCase'           - A logical value to control if the
-   %                            BERTTokenizer is case sensitive or not.
-   %                            The default value is true.
-   %
-   %   'FullTokenizer'        - The underlying word-piece tokenizer.
-   %                            If not specified, a default
-   %                            FullTokenizer is constructed.
-   %
-   %   BERTTokenizer properties:
-   %     FullTokenizer  - The underlying word-piece tokenizer.
-   %     PaddingToken   - The string "[PAD]"
-   %     StartToken     - The string "[CLS]"
-   %     SeparatorToken - The string "[SEP]"
-   %     MaskToken      - The string "[MASK]"
-   %     PaddingCode    - The encoded PaddingToken
-   %     StartCode      - The encoded StartToken
-   %     SeparatorCode  - The encoded SeparatorToken
-   %     MaskCode       - The encoded MaskToken
-   %
-   %   BERTTokenizer methods:
-   %     tokenize     - Tokenize strings
-   %     encode       - Tokenize and encode strings
-   %     encodeTokens - Encode pre-tokenized token sequences
-   %     decode       - Decode an encoded sequence to string
-   %
-   % Example:
-   %   tokenizer = bert.tokenizer.BERTTokenizer();
-   %   sequences = tokenizer.encode("Hello World!")
+    % BERTTokenizer   Construct a tokenizer to use with BERT
+    % models.
+    %
+    %   tokenizer = BERTTokenizer()   Constructs a case-insensitive
+    %   BERTTokenizer using the BERT-Base vocabulary file.
+    %
+    %   tokenizer = BERTTokenizer(vocabFile)   Constructs a
+    %   case-insensitive BERTTokenizer using the file vocabFile as
+    %   the vocabulary.
+    %
+    %   tokenizer = BERTTokenizer(vocabFile,'PARAM1', VAL1, 'PARAM2', VAL2, ...) 
+    %   specifies the optional parameter name/value pairs:
+    %
+    %   'IgnoreCase'           - A logical value to control if the
+    %                            BERTTokenizer is case sensitive or not.
+    %                            The default value is true.
+    %
+    %   'FullTokenizer'        - The underlying word-piece tokenizer.
+    %                            If not specified, a default
+    %                            FullTokenizer is constructed.
+    %
+    %   BERTTokenizer properties:
+    %     FullTokenizer  - The underlying word-piece tokenizer.
+    %     PaddingToken   - The string "[PAD]"
+    %     StartToken     - The string "[CLS]"
+    %     SeparatorToken - The string "[SEP]"
+    %     MaskToken      - The string "[MASK]"
+    %     PaddingCode    - The encoded PaddingToken
+    %     StartCode      - The encoded StartToken
+    %     SeparatorCode  - The encoded SeparatorToken
+    %     MaskCode       - The encoded MaskToken
+    %
+    %   BERTTokenizer methods:
+    %     tokenize     - Tokenize strings
+    %     encode       - Tokenize and encode strings
+    %     encodeTokens - Encode pre-tokenized token sequences
+    %     decode       - Decode an encoded sequence to string
+    %
+    % Example:
+    %   tokenizer = bert.tokenizer.BERTTokenizer();
+    %   sequences = tokenizer.encode("Hello World!")
     
     % Copyright 2021-2023 The MathWorks, Inc.
     
@@ -60,47 +60,47 @@ classdef BERTTokenizer
     
     methods
         function this = BERTTokenizer(vocabFile,nvp)
-           % BERTTokenizer   Construct a tokenizer to use with BERT
-           % models.
-           %
-           %   tokenizer = BERTTokenizer()   Constructs a case-insensitive
-           %   BERTTokenizer using the BERT-Base vocabulary file.
-           %
-           %   tokenizer = BERTTokenizer(vocabFile)   Constructs a
-           %   case-insensitive BERTTokenizer using the file vocabFile as
-           %   the vocabulary.
-           %
-           %   tokenizer = BERTTokenizer(vocabFile,'PARAM1', VAL1, 'PARAM2', VAL2, ...) 
-           %   specifies the optional parameter name/value pairs:
-           %
-           %   'IgnoreCase'           - A logical value to control if the
-           %                            BERTTokenizer is case sensitive or not.
-           %                            The default value is true.
-           %
-           %   'FullTokenizer'        - The underlying word-piece tokenizer.
-           %                            If not specified, a default
-           %                            FullTokenizer is constructed.
-           %
-           %   BERTTokenizer properties:
-           %     FullTokenizer  - The underlying word-piece tokenizer.
-           %     PaddingToken   - The string "[PAD]"
-           %     StartToken     - The string "[CLS]"
-           %     SeparatorToken - The string "[SEP]"
-           %     MaskToken      - The string "[MASK]"
-           %     PaddingCode    - The encoded PaddingToken
-           %     StartCode      - The encoded StartToken
-           %     SeparatorCode  - The encoded SeparatorToken
-           %     MaskCode       - The encoded MaskToken
-           %
-           %   BERTTokenizer methods:
-           %     tokenize     - Tokenize strings
-           %     encode       - Tokenize and encode strings
-           %     encodeTokens - Encode pre-tokenized token sequences
-           %     decode       - Decode an encoded sequence to string
-           %
-           % Example:
-           %   tokenizer = bert.tokenizer.BERTTokenizer();
-           %   sequences = tokenizer.encode("Hello World!")
+            % BERTTokenizer   Construct a tokenizer to use with BERT
+            % models.
+            %
+            %   tokenizer = BERTTokenizer()   Constructs a case-insensitive
+            %   BERTTokenizer using the BERT-Base vocabulary file.
+            %
+            %   tokenizer = BERTTokenizer(vocabFile)   Constructs a
+            %   case-insensitive BERTTokenizer using the file vocabFile as
+            %   the vocabulary.
+            %
+            %   tokenizer = BERTTokenizer(vocabFile,'PARAM1', VAL1, 'PARAM2', VAL2, ...) 
+            %   specifies the optional parameter name/value pairs:
+            %
+            %   'IgnoreCase'           - A logical value to control if the
+            %                            BERTTokenizer is case sensitive or not.
+            %                            The default value is true.
+            %
+            %   'FullTokenizer'        - The underlying word-piece tokenizer.
+            %                            If not specified, a default
+            %                            FullTokenizer is constructed.
+            %
+            %   BERTTokenizer properties:
+            %     FullTokenizer  - The underlying word-piece tokenizer.
+            %     PaddingToken   - The string "[PAD]"
+            %     StartToken     - The string "[CLS]"
+            %     SeparatorToken - The string "[SEP]"
+            %     MaskToken      - The string "[MASK]"
+            %     PaddingCode    - The encoded PaddingToken
+            %     StartCode      - The encoded StartToken
+            %     SeparatorCode  - The encoded SeparatorToken
+            %     MaskCode       - The encoded MaskToken
+            %
+            %   BERTTokenizer methods:
+            %     tokenize     - Tokenize strings
+            %     encode       - Tokenize and encode strings
+            %     encodeTokens - Encode pre-tokenized token sequences
+            %     decode       - Decode an encoded sequence to string
+            %
+            % Example:
+            %   tokenizer = bert.tokenizer.BERTTokenizer();
+            %   sequences = tokenizer.encode("Hello World!")
             arguments
                 vocabFile (1,1) string {mustBeFile} = bert.internal.getSupportFilePath("base","vocab.txt")
                 nvp.IgnoreCase (1,1) logical = true
