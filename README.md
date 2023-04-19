@@ -71,12 +71,14 @@ Download or [clone](https://www.mathworks.com/help/matlab/matlab_prog/use-source
 ## Example: Classify Text Data Using BERT
 The simplest use of a pretrained BERT model is to use it as a feature extractor. In particular, you can use the BERT model to convert documents to feature vectors which you can then use as inputs to train a deep learning classification network.
 
-The example [`ClassifyTextDataUsingBERT.m`](./ClassifyTextDataUsingBERT.m) shows how to use a pretrained BERT model to classify failure events given a data set of factory reports.
+The example [`ClassifyTextDataUsingBERT.m`](./ClassifyTextDataUsingBERT.m) shows how to use a pretrained BERT model to classify failure events given a data set of factory reports. This example requires the `factoryReports.csv` data set from the Text Analytics Toolbox example [Prepare Text Data for Analysis](https://www.mathworks.com/help/textanalytics/ug/prepare-text-data-for-analysis.html).
 
 ## Example: Fine-Tune Pretrained BERT Model
 To get the most out of a pretrained BERT model, you can retrain and fine tune the BERT parameters weights for your task.
 
-The example [`FineTuneBERT.m`](./FineTuneBERT.m) shows how to fine-tune a pretrained BERT model to classify failure events given a data set of factory reports.
+The example [`FineTuneBERT.m`](./FineTuneBERT.m) shows how to fine-tune a pretrained BERT model to classify failure events given a data set of factory reports. This example requires the `factoryReports.csv` data set from the Text Analytics Toolbox example [Prepare Text Data for Analysis](https://www.mathworks.com/help/textanalytics/ug/prepare-text-data-for-analysis.html).
+
+The example [`FineTuneBERTJapanese.m`](./FineTuneBERTJapanese.m) shows the same workflow using a pretrained Japanese-BERT model. This example requires the `factoryReportsJP.csv` data set from the Text Analytics Toolbox example [Analyze Japanese Text Data](https://www.mathworks.com/help/textanalytics/ug/analyze-japanese-text.html), available in R2023a or later.
 
 ## Example: Analyze Sentiment with FinBERT
 FinBERT is a sentiment analysis model trained on financial text data and fine-tuned for sentiment analysis.

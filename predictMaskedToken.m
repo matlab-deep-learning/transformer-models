@@ -6,7 +6,7 @@ function out = predictMaskedToken(mdl,str)
 %   replaces instances of mdl.Tokenizer.MaskToken in the string text with
 %   the most likely token according to the BERT model mdl.
 
-% Copyright 2021 The MathWorks, Inc.
+% Copyright 2021-2023 The MathWorks, Inc.
 arguments
     mdl {mustBeA(mdl,'struct')}
     str {mustBeText}
@@ -44,7 +44,7 @@ for i = 1:numel(pieces)
     tokens = fulltok.tokenize(pieces(i));
     if ~isempty(tokens)
         % "" tokenizes to empty - awkward
-        x = cat(2,x,fulltok.encode(tokens));
+        x = cat(2,x,fulltok.encode(tokens{1}));
     end
     if i<numel(pieces)
         x = cat(2,x,maskCode);
