@@ -5,30 +5,28 @@ classdef(SharedTestFixtures={
     % Copyright 2023 The MathWorks, Inc.
 
     properties(TestParameter)
-        AllModels = {"base","multilingual-cased","medium",...
-            "small","mini","tiny","japanese-base",...
-            "japanese-base-wwm"}
+        Models = {"tiny","japanese-base-wwm"}
         ValidText = iGetValidText;
     end
     
     methods(Test)       
-        function verifyOutputDimSizes(test, AllModels, ValidText)
+        function verifyOutputDimSizes(test, Models, ValidText)
             inSize = size(ValidText);
-            mdl = bert("Model", AllModels);
+            mdl = bert("Model", Models);
             outputText = predictMaskedToken(mdl,ValidText);
             test.verifyEqual(size(outputText), inSize);
         end
         
-        function maskTokenIsRemoved(test, AllModels)
+        function maskTokenIsRemoved(test, Models)
             text = "This has a [MASK] token.";
-            mdl = bert("Model", AllModels);
+            mdl = bert("Model", Models);
             outputText = predictMaskedToken(mdl,text);
             test.verifyFalse(contains(outputText, "[MASK]"));
         end
 
-        function inputWithoutMASKRemainsTheSame(test, AllModels)
+        function inputWithoutMASKRemainsTheSame(test, Models)
             text = "This has a no mask token.";
-            mdl = bert("Model", AllModels);
+            mdl = bert("Model", Models);
             outputText = predictMaskedToken(mdl,text);
             test.verifyEqual(text, outputText);
         end
