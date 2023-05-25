@@ -42,7 +42,7 @@ x = [];
 
 for i = 1:numel(pieces)
     tokens = fulltok.tokenize(pieces(i));
-    if ~isempty(tokens)
+    if ~isempty(tokens{1})
         % "" tokenizes to empty - awkward
         x = cat(2,x,fulltok.encode(tokens{1}));
     end
